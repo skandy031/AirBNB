@@ -1,4 +1,6 @@
+import java.sql.*;
 import java.util.Scanner;
+
 
 public class Driver {
 
@@ -83,7 +85,21 @@ public class Driver {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
+    Connection con = null;
+    try {
+//      Class.forName("com.mysql.jdbc.Driver");
+      con = DriverManager.getConnection("jdbc:mysql://localhost:3306/Database",
+        "username", "password");
+
+      if(!con.isClosed())
+        System.out.println("Successfully connected to " +
+          "MySQL server using TCP/IP...");
+
+    } catch(Exception e) {
+      System.err.println("Exception: " + e.getMessage());
+    }
+
         mainMenu();
     }
 }
