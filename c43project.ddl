@@ -1,0 +1,106 @@
+USE
+final_project;
+
+DROP TABLE IF EXISTS Listing, Address, Amenities, Users, Renter, Hosts, Located, Provides, Owns, Reserved;
+
+
+create table Users
+(
+    sin        integer primary key not null,
+    password varchar(50),
+    occupation varchar(20),
+    firstName  varchar(20)         not null,
+    lastName   varchar(20)         not null,
+    dob        DATE                not null,
+    CHECK ( sin > 0 ),
+    CHECK ( dob < '2004-08-02' )
+);
+
+create table Hosts
+(
+    hostID integer primary key not null references Users (sin)
+);
+
+create table Renter
+(
+    renterID    integer primary key not null references Users (sin),
+    ccNumber    integer             not null,
+    expiryMonth integer             not null,
+    expiryYear  integer             not null,
+    cvc         integer             not null,
+    CHECK ( cvc < 9999 and cvc > 0 ),
+    CHECK ( expiryMonth > 0 and expiryMonth <= 12 ),
+    CHECK ( expiryYear > 2022 or (expiryYear = 2022 and expiryMonth > 8)),
+    CHECK ( ccNumber > 0 and ccNumber < 9999999999999999 )
+);
+
+create table Listing
+(
+    listID      integer     not null,
+    hostID      integer     not null,
+    listingType varchar(15) not null,
+    longitude   double      not null,
+    latitude    double      not null,
+    price       double      not null,
+    primary key (listID, hostID),
+    foreign key (hostID) references Users (sin),
+    CHECK ( latitude >= -85.0 and latitude <= 85.0 ),
+    CHECK ( longitude >= -180.0 and longitude <= 180.0 )
+);
+
+
+create table Address
+(
+    addressID  integer primary key,
+    streetNo   integer     not null,
+    streetName varchar(30) not null,
+    city       varchar(30) not null,
+    province   varchar(30) not null,
+    postalCode varchar(6)  not null,
+    unitNo     integer,
+    CHECK ( streetNo > 0 and unitNo >= 0 )
+);
+
+create table Amenities
+(
+    amenityID integer not null primary key
+--     list of booleans with amenities
+);
+
+
+
+create table Reserved
+(
+    hostId       integer not null,
+    renterID     integer not null,
+    listID       integer not null,
+    startDate    DATE    not null,
+    endDate      DATE    not null,
+    status       boolean not null,
+    primary key (hostID, renterID, listID, startDate, endDate),
+    foreign key (hostId) references Hosts (hostID),
+    foreign key (renterID) references Renter (renterID),
+    foreign key (listID) references Listing (listID),
+    price        double  not null,
+    hostReview   varchar(200),
+    hostScore    integer,
+    renterReview varchar(200),
+    renterScore  integer,
+    CHECK ( hostScore <= 5 and hostScore >= 1 ),
+    CHECK ( renterScore <= 5 and renterScore >= 1 )
+);
+
+create table Owns
+(
+    listID integer not null primary key references Listing (listID)
+);
+
+create table Located
+(
+    listID integer not null primary key references Listing (listID)
+);
+
+create table Provides
+(
+    amenityID integer not null primary key references Amenities (amenityID)
+);
