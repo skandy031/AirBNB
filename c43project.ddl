@@ -1,5 +1,5 @@
 USE
-final_project;
+    final_project;
 
 DROP TABLE IF EXISTS Listing, Address, Amenities, Users, Renter, Hosts, Located, Provides, Owns, Reserved;
 
@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS Listing, Address, Amenities, Users, Renter, Hosts, Located,
 create table Users
 (
     sin        integer primary key not null,
-    password varchar(50),
+    password   varchar(50),
     occupation varchar(20),
     firstName  varchar(20)         not null,
     lastName   varchar(20)         not null,
