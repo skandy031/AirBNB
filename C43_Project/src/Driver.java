@@ -4,6 +4,8 @@ import java.util.Scanner;
 
 public class Driver {
     static Connection con = null;
+    static Scanner scan = new Scanner(System.in);
+
 
 //    public static void createAccount() {
 //        Scanner scan = new Scanner(System.in);
@@ -19,7 +21,6 @@ public class Driver {
 //        String occupation = scan.next();
 //        System.out.println("Date of birth (YYYY-MM-DD):");
 //        String dob = scan.next();
-//        scan.close();
 ////        User.processInfo(con, username, password, firstname, lastname, occupation, dob);
 //        try {
 //            PreparedStatement s = con.prepareStatement("insert into users values (?,?,?,?,?,?)");
@@ -61,7 +62,6 @@ public class Driver {
                 System.out.println("Invalid option. Must be an integer.\n");
                 scan.nextLine();
             }
-            scan.close();
         }
         try {
             if (option == 0) {

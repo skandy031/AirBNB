@@ -4,10 +4,11 @@ import java.sql.*;
 public class Renter {
 
     static Connection con = null;
+    static Scanner scan = new Scanner(System.in);
 
     public static void createAccount(Connection connection) {
         con = connection;
-        Scanner scan = new Scanner(System.in);
+//        Scanner scan = new Scanner(System.in);
         System.out.println("Username (Enter SIN Number):");
         int username = scan.nextInt();
         System.out.println("Password:");
@@ -20,7 +21,6 @@ public class Renter {
         String occupation = scan.next();
         System.out.println("Date of birth (YYYY-MM-DD):");
         String dob = scan.next();
-        scan.close();
 //        User.processInfo(con, username, password, firstname, lastname, occupation, dob);
         try {
             PreparedStatement s = con.prepareStatement("insert into Users values (?,?,?,?,?,?)");
@@ -49,7 +49,6 @@ public class Renter {
         System.out.println("Enter password:");
         String password = scan.next();
 //        scan.nextLine();
-        scan.close();
         //check to see if this matches in database
         try {
             PreparedStatement s = con.prepareStatement("select * from users join renter where " +
@@ -72,43 +71,27 @@ public class Renter {
     public static void handleRenter(int username){
         //take in user input
         int option = -1;
-//        while (true) {
-//            System.out.println("Choose an option:");
-//            System.out.println("(0) Exit System");
-//            System.out.println("(1) Create reservation");
-//            System.out.println("(2) View Reservations");
-//            System.out.println("(3) Cancel Reservation");
-//            System.out.println("(4) Delete Account");
-//            Scanner scan = new Scanner(System.in);
-//            try {
-//                if (scan.hasNext()) {
-//                    option = scan.nextInt();
-//                    break;
-//                }
-//            } catch (Exception e) {
-//                System.out.println("Invalid option. Must be an integer.\n");
-//                scan.nextLine();
-//            }
-//        }
-        System.out.println("Choose an option:");
-        System.out.println("(0) Exit System");
-        System.out.println("(1) Create reservation");
-        System.out.println("(2) View Reservations");
-        System.out.println("(3) Cancel Reservation");
-        System.out.println("(4) Delete Account");
-        Scanner scan = new Scanner(System.in);
-        try {
-            if (scan.hasNext()) {
-                option = scan.nextInt();
+        while (true) {
+            System.out.println("Choose an option:");
+            System.out.println("(0) Exit System");
+            System.out.println("(1) Create reservation");
+            System.out.println("(2) View Reservations");
+            System.out.println("(3) Cancel Reservation");
+            System.out.println("(4) Delete Account");
+            Scanner scan = new Scanner(System.in);
+            try {
+                if (scan.hasNext()) {
+                    option = scan.nextInt();
+                    break;
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid option. Must be an integer.\n");
+                scan.nextLine();
             }
-        } catch (Exception e) {
-            System.out.println("Invalid option. Must be an integer.\n");
-//            scan.nextLine();
-            scan.close();
-//            handleRenter(username);
         }
 
         if (option == 0) {
+            scan.close();
             return;
         } else if (option == 1) {
             // create reservation
@@ -121,7 +104,6 @@ public class Renter {
             deleteAccount(username);
         }else {
             System.out.println("Invalid option.\n");
-            scan.close();
 //            handleRenter(username);
         }
     }
@@ -165,7 +147,6 @@ public class Renter {
             handleRenter(username);
             return;
         }
-        scan.close();
     }
 
     public void createReservation(int username){

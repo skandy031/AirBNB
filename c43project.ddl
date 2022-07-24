@@ -63,31 +63,31 @@ create table Address
 
 create table Amenities
 (
-    amenityID integer not null primary key,
+    amenityID           integer not null primary key,
     --     list of booleans with amenities
-    wifi boolean not null,
-    washer boolean not null,
-    ac boolean not null,
-    heating boolean not null,
-    tv boolean not null,
-    iron boolean not null,
-    kitchen boolean not null,
-    dryer boolean not null,
-    workspace boolean not null,
-    hairDryer boolean not null,
-    pool boolean not null,
-    parking boolean not null,
-    crib boolean not null,
-    grill boolean not null,
-    indoorFireplace boolean not null,
-    hotTub boolean not null,
-    evCharger boolean not null,
-    gym boolean not null,
-    breakfast boolean not null,
-    smoking boolean not null,
-    beachfront boolean not null,
-    waterfront boolean not null,
-    smokeAlarm boolean not null,
+    wifi                boolean not null,
+    washer              boolean not null,
+    ac                  boolean not null,
+    heating             boolean not null,
+    tv                  boolean not null,
+    iron                boolean not null,
+    kitchen             boolean not null,
+    dryer               boolean not null,
+    workspace           boolean not null,
+    hairDryer           boolean not null,
+    pool                boolean not null,
+    parking             boolean not null,
+    crib                boolean not null,
+    grill               boolean not null,
+    indoorFireplace     boolean not null,
+    hotTub              boolean not null,
+    evCharger           boolean not null,
+    gym                 boolean not null,
+    breakfast           boolean not null,
+    smoking             boolean not null,
+    beachfront          boolean not null,
+    waterfront          boolean not null,
+    smokeAlarm          boolean not null,
     carbonMonoxideAlarm boolean not null
 );
 
@@ -127,6 +127,6 @@ create table Located
 create table Provides
 (
     amenityID integer not null references Amenities (amenityID),
-    listID integer not null references Listing (listID),
+    listID    integer not null references Listing (listID),
     primary key (listID, amenityID)
 );
