@@ -21,7 +21,14 @@ public class Renter {
         String occupation = scan.next();
         System.out.println("Date of birth (YYYY-MM-DD):");
         String dob = scan.next();
-//        User.processInfo(con, username, password, firstname, lastname, occupation, dob);
+        System.out.println("Credit Card Number:");
+        int ccnumber = scan.nextInt();
+        System.out.println("Credit Card Expiry Month:");
+        int ccmonth = scan.nextInt();
+        System.out.println("Credit Card Expiry Year:");
+        int ccyear = scan.nextInt();
+        System.out.println("Credit Card CVC:");
+        int cvc = scan.nextInt();
         try {
             PreparedStatement s = con.prepareStatement("insert into Users values (?,?,?,?,?,?)");
             s.setInt(1, username);
@@ -30,14 +37,24 @@ public class Renter {
             s.setString(4, lastname);
             s.setString(5, occupation);
             s.setString(6, dob);
+            PreparedStatement s2 = con.prepareStatement("insert into Renter values (?,?,?,?,?)");
+            s2.setInt(1, username);
+            s2.setInt(2, ccnumber);
+            s2.setInt(3, ccmonth);
+            s2.setInt(4, ccyear);
+            s2.setInt(5, cvc);
+
             int status = s.executeUpdate();
-            if (status == 1){
+            int status2 = s2.executeUpdate();
+            if ((status == 1) && (status2 == 1)){
                 System.out.println("Successfully created.");
             } else{
                 System.out.println("Not able to create account.");
             }
         } catch (Exception e){
             System.out.println(e);
+            System.out.println("Unsuccessful.");
+            createAccount(con);
         }
         handleRenter(username);
     }
@@ -104,15 +121,17 @@ public class Renter {
             deleteAccount(username);
         }else {
             System.out.println("Invalid option.\n");
-//            handleRenter(username);
+            handleRenter(username);
         }
     }
 
     public static void deleteAccount(int username){
         try {
             PreparedStatement s = con.prepareStatement("delete from Users where sin = " + username);
-            int status = s.executeUpdate();
-            if (status == 1) {
+            PreparedStatement s2 = con.prepareStatement("delete from Renter where renterID = " + username);
+            int status1 = s.executeUpdate();
+            int status2 = s2.executeUpdate();
+            if ((status1 == 1) && (status2 == 1)) {
                 System.out.println("Successfully deleted.\n");
                 Driver.mainMenu();
             } else{
