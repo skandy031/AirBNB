@@ -20,15 +20,32 @@ public class Driver {
         System.out.println("Date of birth (YYYY-MM-DD):");
         String dob = scan.next();
         scan.close();
-        User.processInfo(con, username, password, firstname, lastname, occupation, dob);
+//        User.processInfo(con, username, password, firstname, lastname, occupation, dob);
+        try {
+            PreparedStatement s = con.prepareStatement("insert into users values (?,?,?,?,?,?)");
+            s.setInt(1, username);
+            s.setString(2, password);
+            s.setString(3, firstname);
+            s.setString(4, lastname);
+            s.setString(5, occupation);
+            s.setString(6, dob);
+            int status = s.executeUpdate();
+            if (status == 1){
+                System.out.println("Successfully created.");
+            } else{
+                System.out.println("Not able to create account.");
+            }
+        } catch (Exception e){
+            System.out.println(e);
+        }
         //add this user to the database
         //write prompts depending on success/fail
     }
 
-    public static void mainMenu(Connection con) {
+    public static void mainMenu() {
 
         //take in user input
-        int option;
+        int option = -1;
         while (true) {
             System.out.println("Choose an option:");
             System.out.println("(0) Exit System");
@@ -37,28 +54,33 @@ public class Driver {
             System.out.println("(3) Create an account");
             Scanner scan = new Scanner(System.in);
             try {
+                System.out.println("2");
                 option = scan.nextInt();
                 break;
             } catch (Exception e) {
                 System.out.println("Invalid option. Must be an integer.\n");
                 scan.nextLine();
             }
+            scan.close();
         }
-
-        if (option == 0) {
-            return;
-        } else if (option == 1) {
-            Host.handleHostLogin(con);
-        } else if (option == 2) {
-            Renter.handleRenterLogin();
-        } else if (option == 3) {
-            createAccount();
-            mainMenu(con);
-        } else {
-            System.out.println("Invalid option.\n");
-            mainMenu(con);
+        try {
+            if (option == 0) {
+                return;
+            } else if (option == 1) {
+                Host.handleHostLogin(con);
+            } else if (option == 2) {
+                Renter.handleRenterLogin();
+            } else if (option == 3) {
+                createAccount();
+                return;
+            } else {
+                System.out.println("Invalid option.\n");
+                mainMenu();
+                return;
+            }
+        } catch (Exception e){
+            System.out.println(e);
         }
-
     }
 
     public static void main(String[] args) {
@@ -66,8 +88,8 @@ public class Driver {
 //      Class.forName("com.mysql.jdbc.Driver");
 //            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/AirBNB",
 //                    "root", "Skandium86");
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/AirBNB",
-                    "root", "Parekh80!");
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/final_project",
+                    "root", "Parekh80");
 
             if (!con.isClosed())
                 System.out.println("Successfully connected to MySQL server using TCP/IP...");
@@ -79,6 +101,6 @@ public class Driver {
             System.err.println("Exception: " + e.getMessage());
         }
 
-        mainMenu(con);
+        mainMenu();
     }
 }
