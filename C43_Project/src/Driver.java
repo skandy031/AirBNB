@@ -5,42 +5,42 @@ import java.util.Scanner;
 public class Driver {
     static Connection con = null;
 
-    public static void createAccount() {
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Username (Enter SIN Number):");
-        int username = scan.nextInt();
-        System.out.println("Password:");
-        String password = scan.next();
-        System.out.println("First name:");
-        String firstname = scan.next();
-        System.out.println("Last name:");
-        String lastname = scan.next();
-        System.out.println("Occupation:");
-        String occupation = scan.next();
-        System.out.println("Date of birth (YYYY-MM-DD):");
-        String dob = scan.next();
-        scan.close();
-//        User.processInfo(con, username, password, firstname, lastname, occupation, dob);
-        try {
-            PreparedStatement s = con.prepareStatement("insert into users values (?,?,?,?,?,?)");
-            s.setInt(1, username);
-            s.setString(2, password);
-            s.setString(3, firstname);
-            s.setString(4, lastname);
-            s.setString(5, occupation);
-            s.setString(6, dob);
-            int status = s.executeUpdate();
-            if (status == 1){
-                System.out.println("Successfully created.");
-            } else{
-                System.out.println("Not able to create account.");
-            }
-        } catch (Exception e){
-            System.out.println(e);
-        }
-        //add this user to the database
-        //write prompts depending on success/fail
-    }
+//    public static void createAccount() {
+//        Scanner scan = new Scanner(System.in);
+//        System.out.println("Username (Enter SIN Number):");
+//        int username = scan.nextInt();
+//        System.out.println("Password:");
+//        String password = scan.next();
+//        System.out.println("First name:");
+//        String firstname = scan.next();
+//        System.out.println("Last name:");
+//        String lastname = scan.next();
+//        System.out.println("Occupation:");
+//        String occupation = scan.next();
+//        System.out.println("Date of birth (YYYY-MM-DD):");
+//        String dob = scan.next();
+//        scan.close();
+////        User.processInfo(con, username, password, firstname, lastname, occupation, dob);
+//        try {
+//            PreparedStatement s = con.prepareStatement("insert into users values (?,?,?,?,?,?)");
+//            s.setInt(1, username);
+//            s.setString(2, password);
+//            s.setString(3, firstname);
+//            s.setString(4, lastname);
+//            s.setString(5, occupation);
+//            s.setString(6, dob);
+//            int status = s.executeUpdate();
+//            if (status == 1){
+//                System.out.println("Successfully created.");
+//            } else{
+//                System.out.println("Not able to create account.");
+//            }
+//        } catch (Exception e){
+//            System.out.println(e);
+//        }
+//        //add this user to the database
+//        //write prompts depending on success/fail
+//    }
 
     public static void mainMenu() {
 
@@ -51,10 +51,10 @@ public class Driver {
             System.out.println("(0) Exit System");
             System.out.println("(1) Login as Host");
             System.out.println("(2) Login as Renter");
-            System.out.println("(3) Create an account");
+            System.out.println("(3) Create a renter account");
+            System.out.println("(4) Create a host account");
             Scanner scan = new Scanner(System.in);
             try {
-                System.out.println("2");
                 option = scan.nextInt();
                 break;
             } catch (Exception e) {
@@ -69,11 +69,13 @@ public class Driver {
             } else if (option == 1) {
                 Host.handleHostLogin(con);
             } else if (option == 2) {
-                Renter.handleRenterLogin();
+                Renter.handleRenterLogin(con);
             } else if (option == 3) {
-                createAccount();
+                Renter.createAccount(con);
                 return;
-            } else {
+            } else if (option == 4){
+                Host.createAccount(con);
+            }else {
                 System.out.println("Invalid option.\n");
                 mainMenu();
                 return;
