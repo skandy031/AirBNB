@@ -3,38 +3,49 @@ import java.util.Scanner;
 
 
 public class Driver {
-
-    public static void handleHostLogin() {
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Enter username:");
-        String username = scan.next();
-        System.out.println("Enter password:");
-        String password = scan.next();
-        //check to see if this matches in database
-        //if it does not match
-        //print out statement
-        //call function again
-        //if it does match
-        //send to handleHost(user)
-        scan.close();
-    }
+    static Connection con = null;
 
 
-    public void handleHost(String username) {
-        //print out all the options
-        System.out.println("(1) Create listing");
-        System.out.println("(2) View listings");
-        System.out.println("(3) Delete listing");
+//    public static void handleHostLogin() {
+//        Scanner scan = new Scanner(System.in);
+//        System.out.println("Enter username:");
+//        String username = scan.next();
+//        System.out.println("Enter password:");
+//        String password = scan.next();
+//        //check to see if this matches in database
+//        //if it does not match
+//        //print out statement
+//        //call function again
+//        //if it does match
+//        //send to handleHost(user)
+//        scan.close();
+//    }
 
 
-    }
+//    public void handleHost(String username) {
+//        //print out all the options
+//        System.out.println("(1) Create listing");
+//        System.out.println("(2) View listings");
+//        System.out.println("(3) Delete listing");
+//
+//
+//    }
 
     public static void createAccount() {
         Scanner scan = new Scanner(System.in);
         System.out.println("Username (Enter SIN Number):");
         int username = scan.nextInt();
+        int x = 0;
+        String password = "";
+//        while (x == 0) {
+//            System.out.println("Password:");
+//            password = scan.next();
+//            System.out.println("Please Input your password again");
+//            if(password.equals(scan.next()))
+//                x = 1;
+//        }
         System.out.println("Password:");
-        String password = scan.next();
+        password = scan.next();
         System.out.println("First name:");
         String firstname = scan.next();
         System.out.println("Last name:");
@@ -44,15 +55,15 @@ public class Driver {
         System.out.println("Date of birth (YYYY-MM-DD):");
         String dob = scan.next();
         scan.close();
-
+        User.processInfo(con,username, password, firstname, lastname, occupation, dob);
         //add this user to the database
         //write prompts depending on success/fail
     }
 
-    public static void mainMenu() {
+    public static void mainMenu(Connection con) {
 
         //take in user input
-        int option = -1;
+        int option;
         while (true) {
             System.out.println("Choose an option:");
             System.out.println("(0) Exit System");
@@ -72,34 +83,35 @@ public class Driver {
         if (option == 0) {
             return;
         } else if (option == 1) {
-            handleHostLogin();
+            Host.handleHostLogin(con);
         } else if (option == 2) {
             Renter.handleRenterLogin();
         } else if (option == 3) {
             createAccount();
-            mainMenu();
+            mainMenu(con);
         } else {
             System.out.println("Invalid option.\n");
-            mainMenu();
+            mainMenu(con);
         }
 
     }
 
-    public static void main(String[] args) throws SQLException {
-    Connection con = null;
-    try {
+    public static void main(String[] args) {
+        try {
 //      Class.forName("com.mysql.jdbc.Driver");
-      con = DriverManager.getConnection("jdbc:mysql://localhost:3306/Database",
-        "username", "password");
+      con = DriverManager.getConnection("jdbc:mysql://localhost:3306/AirBNB",
+        "root", "Skandium86");
 
       if(!con.isClosed())
-        System.out.println("Successfully connected to " +
-          "MySQL server using TCP/IP...");
-
+        System.out.println("Successfully connected to MySQL server using TCP/IP...");
+//        String sql = "TRUNCATE TABLE Hosts";
+//        Statement stmt = con.createStatement();
+//        stmt.executeUpdate(sql);
+//
     } catch(Exception e) {
       System.err.println("Exception: " + e.getMessage());
     }
 
-        mainMenu();
+        mainMenu(con);
     }
 }
