@@ -121,7 +121,9 @@ create table Owns
 
 create table Located
 (
-    listID integer not null primary key references Listing (listID)
+    listID integer not null references Listing (listID),
+    addressID integer not null references Address (addressID),
+    primary key (listID, addressID)
 );
 
 create table Provides

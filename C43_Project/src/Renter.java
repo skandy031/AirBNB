@@ -8,27 +8,33 @@ public class Renter {
 
     public static void createAccount(Connection connection) {
         con = connection;
-//        Scanner scan = new Scanner(System.in);
-        System.out.println("Username (Enter SIN Number):");
-        int username = scan.nextInt();
-        System.out.println("Password:");
-        String password = scan.next();
-        System.out.println("First name:");
-        String firstname = scan.next();
-        System.out.println("Last name:");
-        String lastname = scan.next();
-        System.out.println("Occupation:");
-        String occupation = scan.next();
-        System.out.println("Date of birth (YYYY-MM-DD):");
-        String dob = scan.next();
-        System.out.println("Credit Card Number:");
-        int ccnumber = scan.nextInt();
-        System.out.println("Credit Card Expiry Month:");
-        int ccmonth = scan.nextInt();
-        System.out.println("Credit Card Expiry Year:");
-        int ccyear = scan.nextInt();
-        System.out.println("Credit Card CVC:");
-        int cvc = scan.nextInt();
+        int username = 0, ccNumber = 0, ccMonth = 0, ccYear = 0, cvc = -1;
+        String password = "", firstname="", lastname="", occupation = "", dob = "";
+        try {
+            System.out.println("Username (Enter SIN Number):");
+            username = scan.nextInt();
+            System.out.println("Password:");
+            password = scan.next();
+            System.out.println("First name:");
+            firstname = scan.next();
+            System.out.println("Last name:");
+            lastname = scan.next();
+            System.out.println("Occupation:");
+            occupation = scan.next();
+            System.out.println("Date of birth (YYYY-MM-DD):");
+            dob = scan.next();
+            System.out.println("Credit Card Number:");
+            ccNumber = scan.nextInt();
+            System.out.println("Credit Card Expiry Month:");
+            ccMonth = scan.nextInt();
+            System.out.println("Credit Card Expiry Year:");
+            ccYear = scan.nextInt();
+            System.out.println("Credit Card CVC:");
+            cvc = scan.nextInt();
+        } catch (Exception e){
+            System.out.println(e);
+            createAccount(con);
+        }
         try {
             PreparedStatement s = con.prepareStatement("insert into Users values (?,?,?,?,?,?)");
             s.setInt(1, username);
@@ -39,9 +45,9 @@ public class Renter {
             s.setString(6, dob);
             PreparedStatement s2 = con.prepareStatement("insert into Renter values (?,?,?,?,?)");
             s2.setInt(1, username);
-            s2.setInt(2, ccnumber);
-            s2.setInt(3, ccmonth);
-            s2.setInt(4, ccyear);
+            s2.setInt(2, ccNumber);
+            s2.setInt(3, ccMonth);
+            s2.setInt(4, ccYear);
             s2.setInt(5, cvc);
 
             int status = s.executeUpdate();
@@ -87,14 +93,15 @@ public class Renter {
 
     public static void handleRenter(int username){
         //take in user input
-        int option = -1;
+        int option;
         while (true) {
-            System.out.println("Choose an option:");
+            System.out.println("\nChoose an option:");
             System.out.println("(0) Exit System");
             System.out.println("(1) Create reservation");
             System.out.println("(2) View Reservations");
             System.out.println("(3) Cancel Reservation");
             System.out.println("(4) Delete Account");
+            System.out.println("(5) Write a review");
             Scanner scan = new Scanner(System.in);
             try {
                 if (scan.hasNext()) {
@@ -103,22 +110,23 @@ public class Renter {
                 }
             } catch (Exception e) {
                 System.out.println("Invalid option. Must be an integer.\n");
-                scan.nextLine();
             }
         }
 
         if (option == 0) {
             scan.close();
-            return;
         } else if (option == 1) {
             // create reservation
         } else if (option == 2) {
             // view reservation
+            showReservations(username);
         } else if (option == 3){
             //delete reservation
         }else if (option == 4){
             //delete account
             deleteAccount(username);
+        } else if (option == 5){
+            //write a review on past stay
         }else {
             System.out.println("Invalid option.\n");
             handleRenter(username);
@@ -138,19 +146,56 @@ public class Renter {
                 System.out.println("Account was not deleted.\n");
                 handleRenter(username);
             }
-            return;
         } catch (SQLException e){
             System.out.println(e);
         }
     }
 
-    public void showReservations(int username){
-        // display all the reservations
+    public static void printResTable(int username){
+        try {
+            PreparedStatement s = con.prepareStatement("select listing.listid, listing.hostid, listing.price, " +
+                    "startdate, enddate, streetno, streetname, city, province, postalcode, unitno from located join " +
+                    "listing join reserved join address where address.addressid = located.addressid " +
+                    "and listing.listid " + "= reserved.listid and listing.listid = located.listid");
+            ResultSet rs = s.executeQuery();
+            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s | %5$-10s | %6$-15s | %7$-15s " +
+                    "| %8$-10s | %9$-10s | %10$-15s | %11$-10s ";
+            System.out.println(String.format(format, "ListID", "HostID", "Price", "Start Date", "End Date",
+                    "House Number", "Street Name", "City", "Province", "Postal Code", "Unit No."));
+            String under = "_";
+            for (int i = 0; i < 150; i++){
+                under += "_";
+            }
+            System.out.println(under);
+            while (rs.next()){
+                int listID = rs.getInt("listID");
+                int hostID = rs.getInt("hostID");
+                int price = rs.getInt("price");
+                String startDate = rs.getString("startdate");
+                String endDate = rs.getString("enddate");
+                int streetNo = rs.getInt("streetno");
+                String streetName = rs.getString("streetname");
+                String city = rs.getString("city");
+                String province = rs.getString("province");
+                String postalCode = rs.getString("postalcode");
+                int unitNo = rs.getInt("unitno");
+                System.out.println(String.format(format, listID+"", hostID+"", price+"", startDate, endDate,
+                        streetNo+"", streetName, city, province, postalCode, unitNo+""));
+
+            }
+        } catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    public static void showReservations(int username){
+        printResTable(username);
+        handleRenter(username);
     }
 
     public void deleteReservation(int username){
         showReservations(username);
-        int option = -1;
+        int option;
         Scanner scan = new Scanner(System.in);
         while (true){
             try {
@@ -164,7 +209,6 @@ public class Renter {
         //search for the reservation and if exists delete it from both renter and make change in host
         if (option == -1){
             handleRenter(username);
-            return;
         }
     }
 
