@@ -28,7 +28,7 @@ create table Renter
     expiryMonth integer             not null,
     expiryYear  integer             not null,
     cvc         integer             not null,
-    CHECK ( cvc < 9999 and cvc > 0 ),
+    CHECK ( cvc < 1000 and cvc > 99 ),
     CHECK ( expiryMonth > 0 and expiryMonth <= 12 ),
     CHECK ( expiryYear > 2022 or (expiryYear = 2022 and expiryMonth > 8)),
     CHECK ( ccNumber > 0 and ccNumber < 9999999999999999 )
@@ -36,13 +36,15 @@ create table Renter
 
 create table Listing
 (
-    listID      integer     not null,
+    listID      integer     not null auto_increment,
     hostID      integer     not null,
     listingType varchar(15) not null,
     longitude   double      not null,
     latitude    double      not null,
     price       double      not null,
-    primary key (listID, hostID),
+    startDate   date        not null,
+    endDate     date        not null,
+    primary key (listID),
     foreign key (hostID) references Users (sin),
     CHECK ( latitude >= -85.0 and latitude <= 85.0 ),
     CHECK ( longitude >= -180.0 and longitude <= 180.0 )
