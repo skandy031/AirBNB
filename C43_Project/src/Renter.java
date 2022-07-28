@@ -118,6 +118,7 @@ public class Renter {
             scan.close();
         } else if (option == 1) {
             // create reservation
+            createReservation(username);
         } else if (option == 2) {
             // view reservation
             showReservations(username);
