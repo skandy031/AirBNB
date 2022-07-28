@@ -1,3 +1,4 @@
+import java.util.HashSet;
 import java.util.Scanner;
 import java.sql.*;
 
@@ -97,11 +98,11 @@ public class Renter {
         while (true) {
             System.out.println("\nChoose an option:");
             System.out.println("(0) Exit System");
-            System.out.println("(1) Create reservation");
+            System.out.println("(1) Create Reservation");
             System.out.println("(2) View Reservations");
             System.out.println("(3) Cancel Reservation");
             System.out.println("(4) Delete Account");
-            System.out.println("(5) Write a review");
+            System.out.println("(5) Write a Review");
             Scanner scan = new Scanner(System.in);
             try {
                 if (scan.hasNext()) {
@@ -127,6 +128,7 @@ public class Renter {
             deleteAccount(username);
         } else if (option == 5){
             //write a review on past stay
+            writeReview(username);
         }else {
             System.out.println("Invalid option.\n");
             handleRenter(username);
@@ -151,23 +153,27 @@ public class Renter {
         }
     }
 
-    public static void printResTable(int username){
+    public static HashSet<Integer> printResTable(int username){
+        HashSet<Integer> listSet = new HashSet<>();
         try {
-            PreparedStatement s = con.prepareStatement("select listing.listid, listing.hostid, listing.price, " +
+            PreparedStatement s = con.prepareStatement("select reserved.reservationID, listing.listid, listing.hostid, listing.price, " +
                     "startdate, enddate, streetno, streetname, city, province, postalcode, unitno from located join " +
                     "listing join reserved join address where address.addressid = located.addressid " +
                     "and listing.listid " + "= reserved.listid and listing.listid = located.listid");
             ResultSet rs = s.executeQuery();
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s | %5$-10s | %6$-15s | %7$-15s " +
-                    "| %8$-10s | %9$-10s | %10$-15s | %11$-10s ";
-            System.out.println(String.format(format, "ListID", "HostID", "Price", "Start Date", "End Date",
+                    "| %8$-10s | %9$-10s | %10$-15s | %11$-10s | %12$-10s";
+            System.out.println(String.format(format, "ReservationID", "ListID", "HostID", "Price", "Start Date", "End Date",
                     "House Number", "Street Name", "City", "Province", "Postal Code", "Unit No."));
             String under = "_";
             for (int i = 0; i < 150; i++){
                 under += "_";
             }
             System.out.println(under);
+
             while (rs.next()){
+                int reservationID = rs.getInt("reservationID");
+                listSet.add(reservationID);
                 int listID = rs.getInt("listID");
                 int hostID = rs.getInt("hostID");
                 int price = rs.getInt("price");
@@ -179,13 +185,14 @@ public class Renter {
                 String province = rs.getString("province");
                 String postalCode = rs.getString("postalcode");
                 int unitNo = rs.getInt("unitno");
-                System.out.println(String.format(format, listID+"", hostID+"", price+"", startDate, endDate,
+                System.out.println(String.format(format, reservationID+"", listID+"", hostID+"", price+"", startDate, endDate,
                         streetNo+"", streetName, city, province, postalCode, unitNo+""));
 
             }
         } catch (Exception e){
             System.out.println(e);
         }
+        return listSet;
     }
 
     public static void showReservations(int username){
@@ -193,10 +200,9 @@ public class Renter {
         handleRenter(username);
     }
 
-    public void deleteReservation(int username){
-        showReservations(username);
+    public static void deleteReservation(int username){
+        printResTable(username);
         int option;
-        Scanner scan = new Scanner(System.in);
         while (true){
             try {
                 System.out.println("Choose a reservation ID to cancel (-1 to exit):");
@@ -212,10 +218,28 @@ public class Renter {
         }
     }
 
-    public void createReservation(int username){
+    public static void createReservation(int username){
         //get dates
+        System.out.println("Starting date of reservation:");
+        String startDate = scan.next();
+        System.out.println("Ending date of reservation:");
+        String endDate = scan.next();
+
         //choose city
+        System.out.println("City:");
+        String city = scan.next();
+
+        //look thru each listing
+        //3 options
+            // not in reserved -> add to set
+            // in reserved with no overlapping dates
+            // in reserved with overlapping dates
+
         //display all the listings that are available
         //prompt choosing an option
+    }
+
+    public static void writeReview(int username) {
+
     }
 }

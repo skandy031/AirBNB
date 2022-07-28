@@ -51,7 +51,7 @@ create table Listing
 
 create table Address
 (
-    addressID  integer primary key,
+    addressID  integer primary key auto_increment,
     streetNo   integer     not null,
     streetName varchar(30) not null,
     city       varchar(30) not null,
@@ -95,21 +95,22 @@ create table Amenities
 
 create table Reserved
 (
-    hostId       integer not null,
-    renterID     integer not null,
-    listID       integer not null,
-    startDate    DATE    not null,
-    endDate      DATE    not null,
-    status       boolean not null,
-    primary key (hostID, renterID, listID, startDate, endDate),
+    reservationID integer not null auto_increment primary key,
+    hostId          integer not null,
+    renterID        integer not null,
+    listID          integer not null,
+    startDate       DATE    not null,
+    endDate         DATE    not null,
+    statusAvailable boolean not null default false,
+#     primary key (hostID, renterID, listID, startDate, endDate),
     foreign key (hostId) references Hosts (hostID),
     foreign key (renterID) references Renter (renterID),
     foreign key (listID) references Listing (listID),
-    price        double  not null,
-    hostReview   varchar(200),
-    hostScore    integer,
-    renterReview varchar(200),
-    renterScore  integer,
+    price           double  not null,
+    hostReview      varchar(200),
+    hostScore       integer,
+    renterReview    varchar(200),
+    renterScore     integer,
     CHECK ( hostScore <= 5 and hostScore >= 1 ),
     CHECK ( renterScore <= 5 and renterScore >= 1 )
 );
@@ -121,7 +122,7 @@ create table Owns
 
 create table Located
 (
-    listID integer not null references Listing (listID),
+    listID    integer not null references Listing (listID),
     addressID integer not null references Address (addressID),
     primary key (listID, addressID)
 );
