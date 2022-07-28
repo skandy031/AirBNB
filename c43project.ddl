@@ -36,13 +36,13 @@ create table Renter
 
 create table Listing
 (
-    listID      integer     not null,
+    listID      integer     not null auto_increment primary key,
     hostID      integer     not null,
     listingType varchar(15) not null,
     longitude   double      not null,
     latitude    double      not null,
     price       double      not null,
-    primary key (listID, hostID),
+#     primary key (listID, hostID),
     foreign key (hostID) references Users (sin),
     CHECK ( latitude >= -85.0 and latitude <= 85.0 ),
     CHECK ( longitude >= -180.0 and longitude <= 180.0 )
@@ -63,7 +63,7 @@ create table Address
 
 create table Amenities
 (
-    amenityID           integer not null primary key,
+    amenityID           integer not null primary key auto_increment,
     --     list of booleans with amenities
     wifi                boolean not null,
     washer              boolean not null,
@@ -95,7 +95,7 @@ create table Amenities
 
 create table Reserved
 (
-    reservationID integer not null auto_increment primary key,
+    reservationID   integer not null auto_increment primary key,
     hostId          integer not null,
     renterID        integer not null,
     listID          integer not null,

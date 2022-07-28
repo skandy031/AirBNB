@@ -123,6 +123,7 @@ public class Renter {
             showReservations(username);
         } else if (option == 3){
             //delete reservation
+            cancelReservation(username);
         }else if (option == 4){
             //delete account
             deleteAccount(username);
@@ -154,12 +155,14 @@ public class Renter {
     }
 
     public static HashSet<Integer> printResTable(int username){
-        HashSet<Integer> listSet = new HashSet<>();
+        HashSet<Integer> reserveSet = new HashSet<>();
         try {
-            PreparedStatement s = con.prepareStatement("select reserved.reservationID, listing.listid, listing.hostid, listing.price, " +
+            PreparedStatement s = con.prepareStatement("select reserved.reservationID, " +
+                    "listing.listid, listing.hostid, listing.price, " +
                     "startdate, enddate, streetno, streetname, city, province, postalcode, unitno from located join " +
                     "listing join reserved join address where address.addressid = located.addressid " +
-                    "and listing.listid " + "= reserved.listid and listing.listid = located.listid");
+                    "and listing.listid " + "= reserved.listid and " +
+                    "listing.listid = located.listid and statusAvailable = false");
             ResultSet rs = s.executeQuery();
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s | %5$-10s | %6$-15s | %7$-15s " +
                     "| %8$-10s | %9$-10s | %10$-15s | %11$-10s | %12$-10s";
@@ -173,7 +176,7 @@ public class Renter {
 
             while (rs.next()){
                 int reservationID = rs.getInt("reservationID");
-                listSet.add(reservationID);
+                reserveSet.add(reservationID);
                 int listID = rs.getInt("listID");
                 int hostID = rs.getInt("hostID");
                 int price = rs.getInt("price");
@@ -192,7 +195,7 @@ public class Renter {
         } catch (Exception e){
             System.out.println(e);
         }
-        return listSet;
+        return reserveSet;
     }
 
     public static void showReservations(int username){
@@ -200,21 +203,74 @@ public class Renter {
         handleRenter(username);
     }
 
-    public static void deleteReservation(int username){
-        printResTable(username);
+    public static void cancelReservation(int username) {
+        HashSet<Integer> resSet = new HashSet<>();
+        try {
+            PreparedStatement s = con.prepareStatement("select reserved.reservationID, listing.listid, " +
+                    "listing.hostid, listing.price, " +
+                    "startdate, enddate, streetno, streetname, city, province, postalcode, unitno from located join " +
+                    "listing join reserved join address where address.addressid = located.addressid " +
+                    "and listing.listid " + "= reserved.listid and listing.listid = located.listid " +
+                    "and statusAvailable = false and startDate > curdate()");
+            ResultSet rs = s.executeQuery();
+            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s | %5$-10s | %6$-15s | %7$-15s " +
+                    "| %8$-10s | %9$-10s | %10$-15s | %11$-10s | %12$-10s";
+            System.out.println(String.format(format, "ReservationID", "ListID", "HostID", "Price", "Start Date",
+                    "End Date", "House Number", "Street Name", "City", "Province", "Postal Code", "Unit No."));
+            String under = "_";
+            for (int i = 0; i < 150; i++) {
+                under += "_";
+            }
+            System.out.println(under);
+
+            while (rs.next()) {
+                int reservationID = rs.getInt("reservationID");
+                resSet.add(reservationID);
+                int listID = rs.getInt("listID");
+                int hostID = rs.getInt("hostID");
+                int price = rs.getInt("price");
+                String startDate = rs.getString("startdate");
+                String endDate = rs.getString("enddate");
+                int streetNo = rs.getInt("streetno");
+                String streetName = rs.getString("streetname");
+                String city = rs.getString("city");
+                String province = rs.getString("province");
+                String postalCode = rs.getString("postalcode");
+                int unitNo = rs.getInt("unitno");
+                System.out.println(String.format(format, reservationID + "", listID + "",
+                        hostID + "", price + "", startDate, endDate,
+                        streetNo + "", streetName, city, province, postalCode, unitNo + ""));
+
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
         int option;
-        while (true){
+        while (true) {
             try {
                 System.out.println("Choose a reservation ID to cancel (-1 to exit):");
                 option = scan.nextInt();
-                break;
-            } catch (Exception e){
+                if (option == -1){
+                    handleRenter(username);
+                }
+                if (resSet.contains(option)) {
+                    try{
+                        //change status on reservation
+                        PreparedStatement s = con.prepareStatement("update reserved set " +
+                                "statusAvailable = true where reservationID = ?");
+                        s.setInt(1, option);
+                        s.executeUpdate();
+                        System.out.println("Successfully cancelled.");
+                        handleRenter(username);
+                        return;
+                    } catch (SQLException e){
+                        System.out.println(e);
+                    }
+                }
+            } catch (Exception e) {
                 System.out.println("Invalid.\n");
             }
-        }
-        //search for the reservation and if exists delete it from both renter and make change in host
-        if (option == -1){
-            handleRenter(username);
         }
     }
 
@@ -241,5 +297,90 @@ public class Renter {
 
     public static void writeReview(int username) {
 
+        HashSet<Integer> resSet = new HashSet<>();
+        try {
+            PreparedStatement s = con.prepareStatement("select reserved.reservationID, " +
+                    "listing.listid, listing.hostid, listing.price, " +
+                    "startdate, enddate, streetno, streetname, city, province, postalcode, unitno from located join " +
+                    "listing join reserved join address where address.addressid = located.addressid " +
+                    "and listing.listid " + "= reserved.listid and listing.listid = located.listid " +
+                    "and statusAvailable = false and endDate < curdate()");
+            ResultSet rs = s.executeQuery();
+            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s | %5$-10s | %6$-15s | %7$-15s " +
+                    "| %8$-10s | %9$-10s | %10$-15s | %11$-10s | %12$-10s";
+            System.out.println(String.format(format, "ReservationID", "ListID", "HostID",
+                    "Price", "Start Date", "End Date",
+                    "House Number", "Street Name", "City", "Province", "Postal Code", "Unit No."));
+            String under = "_";
+            for (int i = 0; i < 150; i++) {
+                under += "_";
+            }
+            System.out.println(under);
+
+            while (rs.next()) {
+                int reservationID = rs.getInt("reservationID");
+                resSet.add(reservationID);
+                int listID = rs.getInt("listID");
+                int hostID = rs.getInt("hostID");
+                int price = rs.getInt("price");
+                String startDate = rs.getString("startdate");
+                String endDate = rs.getString("enddate");
+                int streetNo = rs.getInt("streetno");
+                String streetName = rs.getString("streetname");
+                String city = rs.getString("city");
+                String province = rs.getString("province");
+                String postalCode = rs.getString("postalcode");
+                int unitNo = rs.getInt("unitno");
+                System.out.println(String.format(format, reservationID + "", listID + "", hostID + "", price +
+                                "", startDate, endDate,
+                        streetNo + "", streetName, city, province, postalCode, unitNo + ""));
+
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        int option;
+        while (true) {
+            try {
+                System.out.println("Choose a reservation ID to review (-1 to exit):");
+                option = scan.nextInt();
+                if (option == -1){
+                    handleRenter(username);
+                }
+                int score;
+                if (resSet.contains(option)) {
+                    while (true){
+                        System.out.println("Rate your stay from 1-5:");
+                        try {
+                            score = scan.nextInt();
+                            break;
+                        } catch (Exception e){
+                            System.out.println("Must be an integer.");
+                        }
+                    }
+
+                    System.out.println("Leave a review:");
+                    String review = scan.next();
+
+
+                    try{
+                        //change status on reservation
+                        PreparedStatement s = con.prepareStatement("update reserved set " +
+                                "renterReview = ? where renterScore = ?");
+                        s.setInt(2, score);
+                        s.setString(1, review);
+                        s.executeUpdate();
+                        System.out.println("Successfully updated review.");
+                        handleRenter(username);
+                        return;
+                    } catch (SQLException e){
+                        System.out.println(e);
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid.\n");
+            }
+        }
     }
 }
