@@ -1,5 +1,4 @@
-USE
-    final_project;
+USE final_project;
 
 DROP TABLE IF EXISTS Listing, Address, Amenities, Users, Renter, Hosts, Located, Provides, Owns, Reserved;
 
