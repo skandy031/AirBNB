@@ -161,12 +161,14 @@ public class Host {
             PreparedStatement query4 = con.prepareStatement(query);
             query4.setInt(1,listingKey);
             query4.setInt(2, addressKey);
+            query4.executeUpdate();
 
             query = "INSERT INTO Provides VALUES (?, ?)";
             PreparedStatement query5 = con.prepareStatement(query);
             query5.setInt(1,amenityKey);
             query5.setInt(2, listingKey);
-
+            query5.executeUpdate();
+            
             handleHost();
         }catch(Exception e) {
             System.out.println(e);
