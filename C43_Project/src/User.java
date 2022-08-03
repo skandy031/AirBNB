@@ -39,6 +39,7 @@ public class User {
             System.out.println("(0) Exit System");
             System.out.println("(1) Renter");
             System.out.println("(2) Host");
+            System.out.println("(3) Delete Account");
             Scanner scan = new Scanner(System.in);
             try {
                 if (scan.hasNext()) {
@@ -57,9 +58,11 @@ public class User {
             Renter.handleRenter(username);
         } else if (option == 2) {
             Host.handleHost(username);
+        } else if (option == 3) {
+            deleteAccount();
         } else {
             System.out.println("Invalid option.\n");
-            handleRenter(username);
+            handleUserMainMenu();
         }
     }
 
@@ -144,11 +147,14 @@ public class User {
             } else{
                 System.out.println("Account was not deleted.\n");
                 //send back to handling user work
+                handleUserMainMenu();
             }
         } catch (SQLException e){
             System.out.println(e);
             //send back to handler
+            handleUserMainMenu();
         }
+        Driver.mainMenu();
     }
 
 
