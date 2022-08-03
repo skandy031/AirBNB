@@ -1,9 +1,10 @@
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Scanner;
+//import java.util.ArrayList;
+//import java.util.Hashtable;
+//import java.util.List;
+//import java.util.Scanner;
+import java.util.*;
 
 public class Host {
     static Scanner scan = new Scanner(System.in);
@@ -143,15 +144,12 @@ public class Host {
             for(int i = 1; i <= 24; i++){
                 boolean b = false;
                 if(x.contains(i)){
-                    System.out.println("Hye");
                     b = true;
                 }
                 query3.setBoolean(i,b);
                 amenValues += b;
 
             }
-
-
             query3.executeUpdate();
             rs = query3.getGeneratedKeys();
             rs.next();
@@ -168,7 +166,7 @@ public class Host {
             query5.setInt(1,amenityKey);
             query5.setInt(2, listingKey);
             query5.executeUpdate();
-            
+
             handleHost();
         }catch(Exception e) {
             System.out.println(e);
@@ -180,11 +178,19 @@ public class Host {
             PreparedStatement statement = con.prepareStatement(query);
             statement.setInt(1,user);
             ResultSet rs = statement.executeQuery();
-            Integer i = 0;
+            Integer i = 1;
+            System.out.println("---------------------------------------------\nListings\n---------------------------------------------");
+//            System.out.println("Index | Listing Type | Longitude | Latitude | Price");
+            Formatter fmt = new Formatter();
+            fmt.format("%15s %15s %15s %15s %15s\n", "Listing Id", "Listing Type", "Longitude", "Latitude", "Price");
             while(rs.next()){
 //                String
+//                System.out.print();
+                fmt.format("%14s %14s %14s %14s %14s\n",rs.getInt("listID"), rs.getString("listingType"),rs.getDouble("longitude"),rs.getDouble("latitude"), rs.getDouble("price"));
                 i++;
             }
+
+            System.out.println(fmt+"---------------------------------------------");
             handleHost();
         }catch (SQLException e) {
             System.out.println(e);
@@ -202,10 +208,83 @@ public class Host {
             Integer opt = scan.nextInt();
             if (opt == 1) createListing();
             else if (opt == 2) viewListing();
+            else if (opt == 3) viewBookings();
+            else if (opt == 4) changeAvailability();
+            else if (opt == 5) deleteListing();
         } catch (Exception e) {
             System.out.println(e);
         }
     }
+
+    public static void deleteListing() {
+        System.out.println("Input Listing ID");
+        Integer listingID = scan.nextInt();
+        String query = "SELECT * FROM Listing WHERE listID = ? AND hostID = ?";
+        try{
+            PreparedStatement query1 = con.prepareStatement(query);
+            query1.setInt(1, listingID);
+            query1.setInt(2,user);
+            ResultSet rs = query1.executeQuery();
+            if(rs.next()){
+                Integer addressKey, amenitiesKey,status = 0;
+
+                query = "SELECT addressID FROM Located WHERE listID = ?";
+                query1 = con.prepareStatement(query);
+                query1.setInt(1, listingID);
+                rs = query1.executeQuery();
+                rs.next();
+                addressKey = rs.getInt(1);
+
+                query = "SELECT amenityID FROM Provides WHERE listID = ?";
+                query1 = con.prepareStatement(query);
+                query1.setInt(1, listingID);
+                rs = query1.executeQuery();
+                rs.next();
+                amenitiesKey = rs.getInt(1);
+
+                query = "DELETE FROM Address WHERE addressID = ? ";
+                query1 = con.prepareStatement(query);
+                query1.setInt(1,addressKey);
+                status += query1.executeUpdate();
+
+                query = "DELETE FROM Amenities WHERE amenityID = ?";
+                query1 = con.prepareStatement(query);
+                query1.setInt(1,amenitiesKey);
+                status +=query1.executeUpdate();
+
+                query = "DELETE FROM Listing WHERE listID = ?";
+                query1 = con.prepareStatement(query);
+                query1.setInt(1,listingID);
+                status +=query1.executeUpdate();
+
+                query = "DELETE FROM Provides WHERE listID = ?";
+                query1 = con.prepareStatement(query);
+                query1.setInt(1,listingID);
+                status +=query1.executeUpdate();
+
+                query = "DELETE FROM Located WHERE listID = ?";
+                query1 = con.prepareStatement(query);
+                query1.setInt(1,listingID);
+                status +=query1.executeUpdate();
+
+                if(status == 4){
+                    System.out.println("Successfully Deleted");
+                }
+                handleHost();
+            }
+
+        }catch(Exception e){
+            System.out.println(e);
+        }
+    }
+
+    public static void changeAvailability() {
+
+    }
+
+    public static void viewBookings() {
+    }
+
     public static void createAccount(Connection con) {
 
         System.out.println("Username (Enter SIN Number):");
