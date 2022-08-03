@@ -32,7 +32,7 @@ public class Host {
                 System.out.println("Proper");
                 con = conn;
                 user = username;
-                handleHost();
+                handleHost(user);
             }
             else{
                 System.out.println("Incorrect Credentials\n");
@@ -169,7 +169,7 @@ public class Host {
             query5.setInt(2, listingKey);
             query5.executeUpdate();
             
-            handleHost();
+            handleHost(user);
         }catch(Exception e) {
             System.out.println(e);
         }
@@ -185,13 +185,14 @@ public class Host {
 //                String
                 i++;
             }
-            handleHost();
+            handleHost(user);
         }catch (SQLException e) {
             System.out.println(e);
         }
 
     }
-    public static void handleHost() {
+    public static void handleHost(int input_username) {
+        user = input_username;
         //print out all the options
         System.out.println("(1) Create listing");
         System.out.println("(2) View listings");

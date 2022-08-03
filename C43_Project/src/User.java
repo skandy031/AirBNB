@@ -13,7 +13,6 @@ public class User {
         int username = scan.nextInt();
         System.out.println("Enter password:");
         String password = scan.next();
-//        scan.nextLine();
         //check to see if this matches in database
         try {
             PreparedStatement s = con.prepareStatement("select * from users where " +
@@ -34,7 +33,34 @@ public class User {
     }
 
     public static void handleUserMainMenu(){
+        int option;
+        while (true) {
+            System.out.println("\nChoose an option:");
+            System.out.println("(0) Exit System");
+            System.out.println("(1) Renter");
+            System.out.println("(2) Host");
+            Scanner scan = new Scanner(System.in);
+            try {
+                if (scan.hasNext()) {
+                    option = scan.nextInt();
+                    break;
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid option. Must be an integer.\n");
+            }
+        }
 
+        if (option == 0) {
+            scan.close();
+            Driver.mainMenu();
+        } else if (option == 1) {
+            Renter.handleRenter(username);
+        } else if (option == 2) {
+            Host.handleHost(username);
+        } else {
+            System.out.println("Invalid option.\n");
+            handleRenter(username);
+        }
     }
 
 
