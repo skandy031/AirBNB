@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 import java.sql.*;
 
@@ -50,7 +52,6 @@ public class Renter {
             handleRenter(username);
         }
     }
-
 
 
     public static HashSet<Integer> printResTable(int username){
@@ -173,6 +174,186 @@ public class Renter {
         }
     }
 
+    public static HashSet<Integer> printListingOptions(ResultSet rs){
+        HashSet<Integer> listingSet = new HashSet<>();
+
+        try {
+
+            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s | %5$-10s | %6$-15s ";
+            System.out.println(String.format(format, "ListID", "HostID", "ListingType",
+                    "Longitude", "Latitude", "Price"));
+            String under = "_";
+            for (int i = 0; i < 90; i++){
+                under += "_";
+            }
+            System.out.println(under);
+
+            while (rs.next()){
+                int listID = rs.getInt("listID");
+                listingSet.add(listID);
+                int hostID = rs.getInt("hostID");
+                int price = rs.getInt("price");
+                double longitude = rs.getDouble("longitude");
+                double latitude = rs.getDouble("latitude");
+                String listingType = rs.getString("listingType");
+                System.out.println(String.format(format, listID+"", hostID+"", listingType,
+                        longitude+"", latitude+"", price+""));
+
+            }
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return listingSet;
+    }
+
+    public static void printAmenityList(HashSet<Integer> listingSet){
+        int option;
+        while (true){
+            System.out.println("Choose listing to display amenities:");
+
+            try {
+                option = scan.nextInt();
+                if (!listingSet.contains(option)){
+                    System.out.println("Option not valid.\n");
+                } else{
+                    break;
+                }
+            } catch (Exception e){
+                System.out.println("Invalid option. Must be integer.");
+            }
+        }
+
+        try {
+            PreparedStatement s = con.prepareStatement("select wifi, washer, ac, heating, tv, iron, kitchen, " +
+                    "dryer, workspace, hairDryer, pool, parking, crib, grill, indoorFireplace, hotTub, evCharger, " +
+                    "gym, breakfast, smoking, beachfront, waterfront, smokeAlarm, carbonMonoxideAlarm" +
+                    "from Amenities join Provides join Listing where listing.listID = provides.listID " +
+                    "and listing.listID = ? and amenities.amenityID = provides.amenityID");
+            s.setInt(1, option);
+            ResultSet rs = s.executeQuery();
+
+            if (rs.next()){
+
+                ArrayList<String> names = new ArrayList<>(List.of("wifi", "washer", "ac", "heating", "tv", "iron", "kitchen",
+                        "dryer", "workspace", "hairDryer", "pool", "parking", "crib", "grill", "indoorFireplace", "hotTub", "evCharger",
+                        "gym", "breakfast", "smoking", "beachfront", "waterfront", "smokeAlarm", "carbonMonoxideAlarm"));
+                ArrayList<Boolean> bools = new ArrayList<>();
+                boolean wifi = rs.getBoolean("wifi");
+                bools.add(wifi);
+                boolean washer = rs.getBoolean("washer");
+                bools.add(washer);
+                boolean ac = rs.getBoolean("ac");
+                bools.add(ac);
+                boolean heating = rs.getBoolean("heating");
+                bools.add(heating);
+                boolean tv = rs.getBoolean("tv");
+                bools.add(tv);
+                boolean iron = rs.getBoolean("iron");
+                bools.add(iron);
+                boolean kitchen = rs.getBoolean("kitchen");
+                bools.add(kitchen);
+                boolean dryer = rs.getBoolean("dryer");
+                bools.add(dryer);
+                boolean workspace = rs.getBoolean("workspace");
+                bools.add(workspace);
+                boolean hairDryer = rs.getBoolean("hairDryer");
+                bools.add(hairDryer);
+                boolean pool = rs.getBoolean("pool");
+                bools.add(pool);
+                boolean parking = rs.getBoolean("parking");
+                bools.add(parking);
+                boolean crib = rs.getBoolean("crib");
+                bools.add(crib);
+                boolean grill = rs.getBoolean("grill");
+                bools.add(grill);
+                boolean indoorFireplace = rs.getBoolean("indoorFireplace");
+                bools.add(indoorFireplace);
+                boolean hotTub = rs.getBoolean("hotTub");
+                bools.add(hotTub);
+                boolean evCharger = rs.getBoolean("evCharger");
+                bools.add(evCharger);
+                boolean gym = rs.getBoolean("gym");
+                bools.add(gym);
+                boolean breakfast = rs.getBoolean("breakfast");
+                bools.add(breakfast);
+                boolean smoking = rs.getBoolean("smoking");
+                bools.add(smoking);
+                boolean beachfront = rs.getBoolean("beachfront");
+                bools.add(beachfront);
+                boolean waterfront = rs.getBoolean("waterfront");
+                bools.add(waterfront);
+                boolean smokeAlarm = rs.getBoolean("smokeAlarm");
+                bools.add(smokeAlarm);
+                boolean carbonMonoxideAlarm = rs.getBoolean("carbonMonoxideAlarm");
+                bools.add(carbonMonoxideAlarm);
+
+                System.out.println();
+                for (int i = 0; i < bools.size(); i++){
+                    boolean hasAmen = bools.get(i);
+                    if (hasAmen)
+                        System.out.println(names.get(i) + ": Included");
+                    else{
+                        System.out.println(names.get(i) + ": Not Included");
+                    }
+                }
+            }
+
+        } catch (Exception e){
+            System.out.println(e);
+            printAmenityList(listingSet);
+        }
+    }
+
+    public static void bookListing(HashSet<Integer> listingSet, String startDate, String endDate){
+        int option;
+        while (true){
+            System.out.println("Choose listing to display amenities:");
+
+            try {
+                option = scan.nextInt();
+                if (!listingSet.contains(option)){
+                    System.out.println("Option not valid.\n");
+                } else{
+                    break;
+                }
+            } catch (Exception e){
+                System.out.println("Invalid option. Must be integer.");
+            }
+        }
+
+        try {
+            //get information needed from the listing id
+            PreparedStatement s = con.prepareStatement("select * from listing where listing.listID = ?");
+            s.setInt(1, option);
+            ResultSet rs = s.executeQuery();
+            int price = rs.getInt("price");
+            int hostID = rs.getInt("hostID");
+
+            //add an entry to reserved
+            PreparedStatement s2 = con.prepareStatement("insert into reserved (hostID, renterID, listID, " +
+                    "startDate, endDate, statusAvailable, price) values (?,?,?,?,?, false, ?)");
+            s2.setInt(1, hostID);
+            s2.setInt(2, username);
+            s2.setInt(3, option);
+            s2.setString(4, startDate);
+            s2.setString(5, endDate);
+            s2.setInt(6, price);
+
+            int status = s2.executeUpdate();
+            if (status == 1){
+                System.out.println("Successfully booked!");
+            } else{
+                System.out.println("Unable to complete booking. Please try again.");
+                bookListing(listingSet, startDate, endDate);
+            }
+
+        } catch (Exception e){
+            System.out.println("Unable to complete booking. Please try again.");
+            bookListing(listingSet, startDate, endDate);
+        }
+
+    }
+
     public static void createReservation(int username){
         //get dates
         System.out.println("Starting date of reservation:");
@@ -189,9 +370,57 @@ public class Renter {
         // in reserved with no overlapping dates
         // in reserved with overlapping dates, but is cancelled
 
+
+        try {
+            PreparedStatement s = con.prepareStatement("select * from listing where city = ? and listID " +
+                    "NOT IN (select Reserved.listID from reserved) UNION" +
+                    "select * from listing where city = ? and " +
+                    "NOT IN ( select listID, hostID, listingType, longitude, latitude, price from listing join " +
+                    "reserved where listing.listID = reserved.listID and " +
+                    "(reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false");
+            ResultSet rs = s.executeQuery();
+            HashSet<Integer> listingSet = printListingOptions(rs);
+
+
+            //option to either view amenities or book the listing
+            int option;
+            while (true){
+                System.out.println("\nChoose an option:\n" +
+                        "(0) Exit to Menu \n" +
+                        "(1) View Amenity List for Listing\n" +
+                        "(2) Book Listing");
+
+                try {
+                    option = scan.nextInt();
+                    if (option == 0){
+                        handleRenter(username);
+                        break;
+                    } else if (option == 1){
+                        printAmenityList(listingSet);
+                        System.out.println();
+                        printListingOptions(rs);
+                    } else if (option == 2){
+                        //create reservation
+                        bookListing(listingSet, startDate, endDate);
+                        break;
+                    } else {
+                        System.out.println("Invalid option.");
+                    }
+                } catch (Exception e){
+                    System.out.println("Invalid type. Must be an integer.");
+                }
+            }
+
+
+
+
+
+        } catch (Exception e){
+            System.out.println(e);
+        }
+
         //look through each listing
-        //select * from listing where city = ? and listID NOT IN (select Reserved.listID from reserved);
-        //UNION
+
         //select * from listing join reserved where city = ? and (reserved.startDate > ? or reserved.endDate < ?);
         //UNION
         //select * from listing join reserved where city = ? and (reserved.startDate <= ? and reserved.startDate >= ?) and statusAvailable = true;

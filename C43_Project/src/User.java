@@ -40,7 +40,6 @@ public class User {
             System.out.println("(1) Renter");
             System.out.println("(2) Host");
             System.out.println("(3) Delete Account");
-            Scanner scan = new Scanner(System.in);
             try {
                 if (scan.hasNext()) {
                     option = scan.nextInt();
@@ -156,10 +155,5 @@ public class User {
         }
         Driver.mainMenu();
     }
-
-
-
-
-
 
 }

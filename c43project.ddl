@@ -94,14 +94,14 @@ create table Amenities
 create table Reserved
 (
     reservationID   integer not null auto_increment primary key,
-    hostId          integer not null,
+    hostID          integer not null,
     renterID        integer not null,
     listID          integer not null,
     startDate       DATE    not null,
     endDate         DATE    not null,
     statusAvailable boolean not null default false,
 #     primary key (hostID, renterID, listID, startDate, endDate),
-    foreign key (hostId) references Hosts (hostID),
+    foreign key (hostID) references Hosts (hostID),
     foreign key (renterID) references Renter (renterID),
     foreign key (listID) references Listing (listID),
     price           double  not null,
