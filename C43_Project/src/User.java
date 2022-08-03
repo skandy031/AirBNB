@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class User {
     static Connection con;
-    static int username;
+    static int user;
     static Scanner scan = new Scanner(System.in);
 
     public static void handleLogin(Connection connection){
@@ -22,7 +22,9 @@ public class User {
             ResultSet rs = s.executeQuery();
             if (rs.next()){
                 //entry exists
+                user = username;
                 handleUserMainMenu();
+
             } else {
                 System.out.println("Username and password do not match.\n");
                 handleLogin(con);
@@ -35,7 +37,7 @@ public class User {
     public static void handleUserMainMenu(){
         int option;
         while (true) {
-            System.out.println("\nChoose an option:");
+            System.out.println("Choose an option:");
             System.out.println("(0) Exit System");
             System.out.println("(1) Renter");
             System.out.println("(2) Host");
@@ -55,9 +57,9 @@ public class User {
             scan.close();
             Driver.mainMenu();
         } else if (option == 1) {
-            Renter.handleRenter(username);
+            Renter.handleRenter(user);
         } else if (option == 2) {
-            Host.handleHost(username);
+            Host.handleHost(user, con);
         } else if (option == 3) {
             deleteAccount();
         } else {
@@ -135,9 +137,9 @@ public class User {
 
     public static void deleteAccount(){
         try {
-            PreparedStatement s = con.prepareStatement("delete from Users where sin = " + username);
-            PreparedStatement s2 = con.prepareStatement("delete from Renter where renterID = " + username);
-            PreparedStatement s3 = con.prepareStatement("delete from Hosts where hostID = " + username);
+            PreparedStatement s = con.prepareStatement("delete from Users where sin = " + user);
+            PreparedStatement s2 = con.prepareStatement("delete from Renter where renterID = " + user);
+            PreparedStatement s3 = con.prepareStatement("delete from Hosts where hostID = " + user);
             int status1 = s.executeUpdate();
             int status2 = s2.executeUpdate();
             int status3 = s3.executeUpdate();

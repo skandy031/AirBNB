@@ -13,7 +13,7 @@ public class Driver {
         while (true) {
             System.out.println("Choose an option:");
             System.out.println("(0) Exit System");
-            System.out.println("(1) Login as Host");
+            System.out.println("(1) Login");
             System.out.println("(2) Create an Account");
             System.out.println("(3) Reports and Queries");
             Scanner scan = new Scanner(System.in);

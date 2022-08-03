@@ -10,46 +10,47 @@ public class Host {
     static Connection con = null;
     static Integer user = null;
 
-    public static void handleHostLogin(Connection conn)  {
-        System.out.println("Enter username:");
-        Integer username = scan.nextInt();
-        System.out.println("Enter password:");
-        String password = scan.next();
-        con = conn;
-        try{
-            //Query checks Users database
-            PreparedStatement query1 = con.prepareStatement("SELECT sin,password FROM Users WHERE sin = ? AND password = ?");
-            query1.setInt(1, username);
-            query1.setString(2, password);
-            ResultSet rs1 = query1.executeQuery();
+//    public static void handleHostLogin(Connection conn)  {
+//        System.out.println("Enter username:");
+//        Integer username = scan.nextInt();
+//        System.out.println("Enter password:");
+//        String password = scan.next();
+//        con = conn;
+//        try{
+//            //Query checks Users database
+//            PreparedStatement query1 = con.prepareStatement("SELECT sin,password FROM Users WHERE sin = ? AND password = ?");
+//            query1.setInt(1, username);
+//            query1.setString(2, password);
+//            ResultSet rs1 = query1.executeQuery();
+//
+//            //Query checks Hosts database
+//            PreparedStatement query2 = con.prepareStatement("SELECT * FROM Hosts WHERE hostID = ?");
+//            query2.setInt(1, username);
+//            ResultSet rs2 = query2.executeQuery();
+//
+//            if(rs1.next() && rs2.next()){
+//                System.out.println("Proper");
+//                con = conn;
+//                user = username;
+//                handleHost(user);
+//            }
+//            else{
+//                System.out.println("Incorrect Credentials\n");
+//                handleHostLogin(con);
+//
+//            }
+//        }catch(Exception e) {
+//            System.out.println(e);
+//        }
+//        //check to see if this matches in database
+//        //if it does not match
+//        //print out statement
+//        //call function again
+//        //if it does match
+//        //send to handleHost(user)
+//        scan.close();
+//    }
 
-            //Query checks Hosts database
-            PreparedStatement query2 = con.prepareStatement("SELECT * FROM Hosts WHERE hostID = ?");
-            query2.setInt(1, username);
-            ResultSet rs2 = query2.executeQuery();
-
-            if(rs1.next() && rs2.next()){
-                System.out.println("Proper");
-                con = conn;
-                user = username;
-                handleHost(user);
-            }
-            else{
-                System.out.println("Incorrect Credentials\n");
-                handleHostLogin(con);
-
-            }
-        }catch(Exception e) {
-            System.out.println(e);
-        }
-        //check to see if this matches in database
-        //if it does not match
-        //print out statement
-        //call function again
-        //if it does match
-        //send to handleHost(user)
-        scan.close();
-    }
     public static void createListing(){
         Hashtable<Integer, String> listingTypes  = new Hashtable<Integer, String>(){{put(1,"Full house");
             put(2, "Apartment");
@@ -68,6 +69,7 @@ public class Host {
             System.out.println("Price");
             Double price = scan.nextDouble();
             // Insert into Database
+            System.out.println(user);
             String query = "INSERT INTO Listing (hostID,listingType,longitude,latitude,price) VALUES (?,?,?,?,?)";
             PreparedStatement query1 = con.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
             query1.setInt(1, user);
@@ -169,7 +171,7 @@ public class Host {
             query5.setInt(2, listingKey);
             query5.executeUpdate();
             
-            handleHost(user);
+//            handleHost(user);
         }catch(Exception e) {
             System.out.println(e);
         }
@@ -185,14 +187,55 @@ public class Host {
 //                String
                 i++;
             }
-            handleHost(user);
+            handleHost(user, con);
         }catch (SQLException e) {
             System.out.println(e);
         }
 
     }
-    public static void handleHost(int input_username) {
+
+    public static void deleteListing(){
+        System.out.println("Enter Listing ID");
+        Integer listId = scan.nextInt();
+        String query = "SELECT * FROM Listing WHERE listID = ?";
+        try {
+            PreparedStatement query1 = con.prepareStatement(query);
+            query1.setInt(1, listId);
+            ResultSet rs = query1.executeQuery();
+            if(rs.next()){
+//                query = "SELECT addressID FROM Located WHERE listID = ?";
+//                query1.setInt(1, listId);
+//                rs = query1.executeQuery();
+//                rs.next();
+//                Integer adKey = rs.getInt("1");
+//
+//                query = "SELECT amenitiyID FROM Located WHERE listID = ?";
+//                query1.setInt(1, listId);
+//                rs = query1.executeQuery();
+//                rs.next();
+//                Integer amKey = rs.getInt(1);
+                query = "SET SQL_SAFE_UPDATES = 0";
+                query1 = con.prepareStatement(query);
+                query1.executeUpdate();
+                query =   "DELETE Listing, Located, Amenities, Address, Provides FROM Listing AS L join Located USING (listID) join Address using (addressID) join (Listing join Provides using (listID) join Amenities using (amenityID))\n" +
+                    "WHERE L.listID = ?";
+                query1 = con.prepareStatement(query);
+                query1.setInt(1,listId);
+                System.out.println(query1.executeUpdate());
+
+                System.out.println("Got it bro");
+            }
+            else{
+                System.out.println("Wrong bro");
+            }
+        }catch(Exception e){
+            System.out.println(e);
+        }
+
+    }
+    public static void handleHost(int input_username, Connection conn) {
         user = input_username;
+        con = conn;
         //print out all the options
         System.out.println("(1) Create listing");
         System.out.println("(2) View listings");
@@ -203,6 +246,7 @@ public class Host {
             Integer opt = scan.nextInt();
             if (opt == 1) createListing();
             else if (opt == 2) viewListing();
+            else if (opt  == 5) deleteListing();
         } catch (Exception e) {
             System.out.println(e);
         }
