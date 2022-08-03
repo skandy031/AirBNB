@@ -128,6 +128,6 @@ create table Located
 create table Provides
 (
     amenityID integer not null references Amenities (amenityID),
-    listID    integer not null references Listing (listID),
-    primary key (listID, amenityID)
+    listID    integer primary key not null references Listing (listID)
+#     primary key (listID, amenityID)
 );

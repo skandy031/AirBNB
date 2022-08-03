@@ -51,9 +51,8 @@ public class Driver {
             System.out.println("Choose an option:");
             System.out.println("(0) Exit System");
             System.out.println("(1) Login as Host");
-            System.out.println("(2) Login as Renter");
-            System.out.println("(3) Create a renter account");
-            System.out.println("(4) Create a host account");
+            System.out.println("(2) Create an Account");
+            System.out.println("(3) Reports and Queries");
             Scanner scan = new Scanner(System.in);
             try {
                 option = scan.nextInt();
@@ -67,18 +66,14 @@ public class Driver {
             if (option == 0) {
                 return;
             } else if (option == 1) {
-                Host.handleHostLogin(con);
+                User.handleLogin(con);
             } else if (option == 2) {
-                Renter.handleRenterLogin(con);
+                User.createAccount(con);
             } else if (option == 3) {
-                Renter.createAccount(con);
-                return;
-            } else if (option == 4){
-                Host.createAccount(con);
-            }else {
+                ReportsQueries.mainMenu(con);
+            } else {
                 System.out.println("Invalid option.\n");
                 mainMenu();
-                return;
             }
         } catch (Exception e){
             System.out.println(e);
