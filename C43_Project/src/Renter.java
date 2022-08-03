@@ -6,93 +6,10 @@ public class Renter {
 
     static Connection con = null;
     static Scanner scan = new Scanner(System.in);
+    static int username;
 
-    public static void createAccount(Connection connection) {
-        con = connection;
-        int username = 0, ccNumber = 0, ccMonth = 0, ccYear = 0, cvc = -1;
-        String password = "", firstname="", lastname="", occupation = "", dob = "";
-        try {
-            System.out.println("Username (Enter SIN Number):");
-            username = scan.nextInt();
-            System.out.println("Password:");
-            password = scan.next();
-            System.out.println("First name:");
-            firstname = scan.next();
-            System.out.println("Last name:");
-            lastname = scan.next();
-            System.out.println("Occupation:");
-            occupation = scan.next();
-            System.out.println("Date of birth (YYYY-MM-DD):");
-            dob = scan.next();
-            System.out.println("Credit Card Number:");
-            ccNumber = scan.nextInt();
-            System.out.println("Credit Card Expiry Month:");
-            ccMonth = scan.nextInt();
-            System.out.println("Credit Card Expiry Year:");
-            ccYear = scan.nextInt();
-            System.out.println("Credit Card CVC:");
-            cvc = scan.nextInt();
-        } catch (Exception e){
-            System.out.println(e);
-            createAccount(con);
-        }
-        try {
-            PreparedStatement s = con.prepareStatement("insert into Users values (?,?,?,?,?,?)");
-            s.setInt(1, username);
-            s.setString(2, password);
-            s.setString(3, firstname);
-            s.setString(4, lastname);
-            s.setString(5, occupation);
-            s.setString(6, dob);
-            PreparedStatement s2 = con.prepareStatement("insert into Renter values (?,?,?,?,?)");
-            s2.setInt(1, username);
-            s2.setInt(2, ccNumber);
-            s2.setInt(3, ccMonth);
-            s2.setInt(4, ccYear);
-            s2.setInt(5, cvc);
-
-            int status = s.executeUpdate();
-            int status2 = s2.executeUpdate();
-            if ((status == 1) && (status2 == 1)){
-                System.out.println("Successfully created.");
-            } else{
-                System.out.println("Not able to create account.");
-            }
-        } catch (Exception e){
-            System.out.println(e);
-            System.out.println("Unsuccessful.");
-            createAccount(con);
-        }
-        handleRenter(username);
-    }
-    public static void handleRenterLogin(Connection connection){
-        con = connection;
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Enter username:");
-        int username = scan.nextInt();
-        System.out.println("Enter password:");
-        String password = scan.next();
-//        scan.nextLine();
-        //check to see if this matches in database
-        try {
-            PreparedStatement s = con.prepareStatement("select * from users join renter where " +
-                    "users.sin = renter.renterid and sin = ? and password = ?");
-            s.setInt(1, username);
-            s.setString(2, password);
-            ResultSet rs = s.executeQuery();
-            if (rs.next()){
-                //entry exists
-                handleRenter(username);
-            } else {
-                System.out.println("Username and password do not match.\n");
-                handleRenterLogin(con);
-            }
-        } catch (SQLException e){
-            System.out.println(e);
-        }
-    }
-
-    public static void handleRenter(int username){
+    public static void handleRenter(int input_username){
+        username = input_username;
         //take in user input
         int option;
         while (true) {
@@ -101,8 +18,7 @@ public class Renter {
             System.out.println("(1) Create Reservation");
             System.out.println("(2) View Reservations");
             System.out.println("(3) Cancel Reservation");
-            System.out.println("(4) Delete Account");
-            System.out.println("(5) Write a Review");
+            System.out.println("(4) Write a Review");
             Scanner scan = new Scanner(System.in);
             try {
                 if (scan.hasNext()) {
@@ -116,6 +32,7 @@ public class Renter {
 
         if (option == 0) {
             scan.close();
+            Driver.mainMenu();
         } else if (option == 1) {
             // create reservation
             createReservation(username);
@@ -125,10 +42,7 @@ public class Renter {
         } else if (option == 3){
             //delete reservation
             cancelReservation(username);
-        }else if (option == 4){
-            //delete account
-            deleteAccount(username);
-        } else if (option == 5){
+        } else if (option == 4){
             //write a review on past stay
             writeReview(username);
         }else {
@@ -137,23 +51,7 @@ public class Renter {
         }
     }
 
-    public static void deleteAccount(int username){
-        try {
-            PreparedStatement s = con.prepareStatement("delete from Users where sin = " + username);
-            PreparedStatement s2 = con.prepareStatement("delete from Renter where renterID = " + username);
-            int status1 = s.executeUpdate();
-            int status2 = s2.executeUpdate();
-            if ((status1 == 1) && (status2 == 1)) {
-                System.out.println("Successfully deleted.\n");
-                Driver.mainMenu();
-            } else{
-                System.out.println("Account was not deleted.\n");
-                handleRenter(username);
-            }
-        } catch (SQLException e){
-            System.out.println(e);
-        }
-    }
+
 
     public static HashSet<Integer> printResTable(int username){
         HashSet<Integer> reserveSet = new HashSet<>();
@@ -286,11 +184,19 @@ public class Renter {
         System.out.println("City:");
         String city = scan.next();
 
-        //look thru each listing
         //3 options
-            // not in reserved -> add to set
-            // in reserved with no overlapping dates
-            // in reserved with overlapping dates
+        // not in reserved -> add to set
+        // in reserved with no overlapping dates
+        // in reserved with overlapping dates, but is cancelled
+
+        //look through each listing
+        //select * from listing where city = ? and listID NOT IN (select Reserved.listID from reserved);
+        //UNION
+        //select * from listing join reserved where city = ? and (reserved.startDate > ? or reserved.endDate < ?);
+        //UNION
+        //select * from listing join reserved where city = ? and (reserved.startDate <= ? and reserved.startDate >= ?) and statusAvailable = true;
+
+        //select * from listing join reserved where city = ? and listing.listID = reserved.listID and NOT IN ( select * from listing join reserved where (reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false);
 
         //display all the listings that are available
         //prompt choosing an option
@@ -385,3 +291,26 @@ public class Renter {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
