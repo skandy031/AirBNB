@@ -49,7 +49,7 @@ public class Driver {
 //            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/AirBNB",
 //                    "root", "Skandium86");
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/final_project",
-                    "root", "Skandium86");
+                    "root", "Parekh80");
 
             if (!con.isClosed())
                 System.out.println("Successfully connected to MySQL server using TCP/IP...");

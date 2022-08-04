@@ -180,7 +180,7 @@ public class Renter {
         try {
 
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s | %5$-10s | %6$-15s ";
-            System.out.println(String.format(format, "ListID", "HostID", "ListingType",
+            System.out.println(String.format(format, "Listing ID", "Host ID", "Listing Type",
                     "Longitude", "Latitude", "Price"));
             String under = "_";
             for (int i = 0; i < 90; i++){
@@ -307,7 +307,7 @@ public class Renter {
     public static void bookListing(HashSet<Integer> listingSet, String startDate, String endDate){
         int option;
         while (true){
-            System.out.println("Choose listing to display amenities:");
+            System.out.println("Choose listing to book:");
 
             try {
                 option = scan.nextInt();
@@ -378,6 +378,10 @@ public class Renter {
                     "NOT IN ( select listID, hostID, listingType, longitude, latitude, price from listing join " +
                     "reserved where listing.listID = reserved.listID and " +
                     "(reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false");
+            s.setString(1, city);
+            s.setString(2, city);
+            s.setString(3, endDate);
+            s.setString(4, startDate);
             ResultSet rs = s.executeQuery();
             HashSet<Integer> listingSet = printListingOptions(rs);
 
