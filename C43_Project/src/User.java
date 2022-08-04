@@ -8,9 +8,17 @@ public class User {
 
     public static void handleLogin(Connection connection){
         con = connection;
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Enter username:");
-        int username = scan.nextInt();
+        int username;
+        while (true){
+            try {
+                System.out.println("Enter username:");
+                username = scan.nextInt();
+                break;
+            } catch (Exception e){
+                System.out.println("Must be an integer. Please try again. \n");
+            }
+        }
+
         System.out.println("Enter password:");
         String password = scan.next();
         //check to see if this matches in database

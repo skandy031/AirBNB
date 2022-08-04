@@ -51,6 +51,7 @@ create table Address
     streetName varchar(30) not null,
     city       varchar(30) not null,
     province   varchar(30) not null,
+    country    varchar(30) not null,
     postalCode varchar(6)  not null,
     unitNo     integer,
     CHECK ( streetNo > 0 and unitNo >= 0 )
