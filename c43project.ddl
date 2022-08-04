@@ -6,8 +6,8 @@ DROP TABLE IF EXISTS Listing, Address, Amenities, Users, Renter, Hosts, Located,
 create table Users
 (
     sin        integer primary key not null,
-    password   varchar(50) DEFAULT 'No Occupation',
-    occupation varchar(20),
+    password   varchar(50) ,
+    occupation varchar(20) DEFAULT 'No Occupation',
     firstName  varchar(20)         not null,
     lastName   varchar(20)         not null,
     dob        DATE                not null,

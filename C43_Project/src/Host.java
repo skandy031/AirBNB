@@ -171,7 +171,7 @@ public class Host {
             query5.setInt(2, listingKey);
             query5.executeUpdate();
             
-//            handleHost(user);
+            handleHost(user, con);
         }catch(Exception e) {
             System.out.println(e);
         }
@@ -183,9 +183,15 @@ public class Host {
             statement.setInt(1,user);
             ResultSet rs = statement.executeQuery();
             Integer i = 0;
+            String fmt = "|%-9s|%-13s|%-10s|%-10s|%-7s|";
+            System.out.println(String.format(fmt, "ListID", "Listing Type", "Longitude", "Latitude", "Price"));
             while(rs.next()){
-//                String
-                i++;
+                Integer listId = rs.getInt("listID");
+                String type = rs.getString("listingType");
+                Double lon = rs.getDouble("longitude");
+                Double lat = rs.getDouble("latitude");
+                Double price = rs.getDouble("price");
+                System.out.println(String.format(fmt,listId,type,lon,lat,+price));
             }
             handleHost(user, con);
         }catch (SQLException e) {
@@ -193,8 +199,7 @@ public class Host {
         }
 
     }
-
-    public static void deleteListing(){
+    public static Integer validListingID(){
         System.out.println("Enter Listing ID");
         Integer listId = scan.nextInt();
         String query = "SELECT * FROM Listing WHERE listID = ?";
@@ -202,35 +207,68 @@ public class Host {
             PreparedStatement query1 = con.prepareStatement(query);
             query1.setInt(1, listId);
             ResultSet rs = query1.executeQuery();
-            if(rs.next()){
-//                query = "SELECT addressID FROM Located WHERE listID = ?";
-//                query1.setInt(1, listId);
-//                rs = query1.executeQuery();
-//                rs.next();
-//                Integer adKey = rs.getInt("1");
-//
-//                query = "SELECT amenitiyID FROM Located WHERE listID = ?";
-//                query1.setInt(1, listId);
-//                rs = query1.executeQuery();
-//                rs.next();
-//                Integer amKey = rs.getInt(1);
-                query = "SET SQL_SAFE_UPDATES = 0";
-                query1 = con.prepareStatement(query);
-                query1.executeUpdate();
-                query =   "DELETE Listing, Located, Amenities, Address, Provides FROM Listing AS L join Located USING (listID) join Address using (addressID) join (Listing join Provides using (listID) join Amenities using (amenityID))\n" +
-                    "WHERE L.listID = ?";
-                query1 = con.prepareStatement(query);
-                query1.setInt(1,listId);
-                System.out.println(query1.executeUpdate());
-
-                System.out.println("Got it bro");
-            }
-            else{
-                System.out.println("Wrong bro");
-            }
+            if(rs.next()) return listId;
+            else return 0;
         }catch(Exception e){
             System.out.println(e);
         }
+        return 0;
+    }
+    public static void deleteListing(){
+        Integer listId = validListingID();
+        if(listId == 0) return;
+        String query;
+        try {
+            PreparedStatement query1;
+            ResultSet rs;
+            query = "SET SQL_SAFE_UPDATES = 0";
+            query1 = con.prepareStatement(query);
+            query1.executeUpdate();
+            query =   "DELETE Listing, Located, Amenities, Address, Provides FROM Listing AS L join Located USING (listID) join Address using (addressID) join (Listing join Provides using (listID) join Amenities using (amenityID))\n" +
+                "WHERE L.listID = ?";
+            query1 = con.prepareStatement(query);
+            query1.setInt(1,listId);
+
+            if(5 == query1.executeUpdate()) System.out.println("Deleted Listing " + listId);
+            else System.out.println("Unsuccessful");
+        }catch(Exception e){
+            System.out.println(e);
+        }
+//create table x (
+//    start integer,
+//            end integer
+//        );
+//insert into x VALUES(1,4);
+//insert into x VALUES(7,10);
+//insert into x VALUES(11,14);
+//
+//SELECT * FROM x
+//WHERE x.start <= $startdate AND (end IS NULL or end >=endated)
+    }
+    public static void changeAvailability(){
+        Integer listId = validListingID();
+        if (listId == 0) return;
+        System.out.println("Start Date (yyyy-mm-dd):");
+        String startDate = scan.next();
+        System.out.println("End Date (yyyy-mm-dd):");
+        String endDate = scan.next();
+
+        String query = "SELECT * FROM Reserved WHERE ? <= endDate AND ? >= startDate AND ";
+        try{
+            PreparedStatement query1 = con.prepareStatement(query);
+            query1.setString(1,startDate);
+            query1.setString(2,endDate);
+            ResultSet rs = query1.executeQuery();
+            if(rs.next()){
+                System.out.println("Interferes with existing bookings");
+                return;
+            }
+        }catch(Exception E){
+            System.out.println(E);
+        }
+
+
+
 
     }
     public static void handleHost(int input_username, Connection conn) {
@@ -246,6 +284,7 @@ public class Host {
             Integer opt = scan.nextInt();
             if (opt == 1) createListing();
             else if (opt == 2) viewListing();
+            else if (opt == 4) changeAvailability();
             else if (opt  == 5) deleteListing();
         } catch (Exception e) {
             System.out.println(e);
