@@ -253,7 +253,7 @@ public class Host {
         System.out.println("End Date (yyyy-mm-dd):");
         String endDate = scan.next();
 
-        String query = "SELECT * FROM Reserved WHERE ? <= endDate AND ? >= startDate AND ";
+        String query = "SELECT * FROM Reserved WHERE ? <= endDate AND ? >= startDate AND status = false";
         try{
             PreparedStatement query1 = con.prepareStatement(query);
             query1.setString(1,startDate);
