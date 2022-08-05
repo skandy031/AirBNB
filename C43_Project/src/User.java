@@ -31,7 +31,7 @@ public class User {
             if (rs.next()){
                 //entry exists
                 user = username;
-                handleUserMainMenu();
+                handleUserMainMenu(username);
 
             } else {
                 System.out.println("Username and password do not match.\n");
@@ -42,7 +42,8 @@ public class User {
         }
     }
 
-    public static void handleUserMainMenu(){
+    public static void handleUserMainMenu(int username){
+        user = username;
         int option;
         while (true) {
             System.out.println("Choose an option:");
@@ -71,7 +72,7 @@ public class User {
             deleteAccount();
         } else {
             System.out.println("Invalid option.\n");
-            handleUserMainMenu();
+            handleUserMainMenu(username);
         }
     }
 
@@ -156,12 +157,12 @@ public class User {
             } else{
                 System.out.println("Account was not deleted.\n");
                 //send back to handling user work
-                handleUserMainMenu();
+                handleUserMainMenu(user);
             }
         } catch (SQLException e){
             System.out.println(e);
             //send back to handler
-            handleUserMainMenu();
+            handleUserMainMenu(user);
         }
         Driver.mainMenu();
     }
