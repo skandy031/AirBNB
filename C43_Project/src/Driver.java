@@ -45,18 +45,14 @@ public class Driver {
 
     public static void main(String[] args) {
         try {
-//      Class.forName("com.mysql.jdbc.Driver");
-//            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/AirBNB",
-//                    "root", "Skandium86");
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/final_project",
-                    "root", "Parekh80");
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/AirBNB",
+                    "root", "Skandium86");
+//            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/final_project",
+//                    "root", "Parekh80");
 
             if (!con.isClosed())
                 System.out.println("Successfully connected to MySQL server using TCP/IP...");
-//        String sql = "TRUNCATE TABLE Hosts";
-//        Statement stmt = con.createStatement();
-//        stmt.executeUpdate(sql);
-//
+
         } catch (Exception e) {
             System.err.println("Exception: " + e.getMessage());
         }
