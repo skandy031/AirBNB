@@ -8,11 +8,86 @@ public class ReportsQueries {
     static Connection con;
     static Scanner scan = new Scanner(System.in);
 
-    public static void mainMenu(Connection connection) {
+    static int user;
+
+    public static void mainMenu(Connection connection, int username) {
         con = connection;
+        user = username;
 
         //display all options
+        System.out.println("Choose an option:\n" +
+                "(0) Exit\n" +
+                "(1) Search by Distance\n" +
+                "(2) Search by Postal Code\n" +
+                "(3) Search by Address\n" +
+                "(4) Search by Date Range\n" +
+                "(5) Filtered Search\n" +
+                "(6) Number of Bookings by City in Date Range\n" +
+                "(7) Number of Bookings by City, Zip in Date Range\n" +
+                "(8) Number of Listings by Country\n" +
+                "(9) Number of Listings by City, Country\n" +
+                "(10) Number of Listings by Zip, City, Country\n" +
+                "(11) Rank Hosts by Number of Listings - Country\n" +
+                "(12) Rank Hosts by Number of Listings - City\n" +
+                "(13) Find Potential Commercial Hosts - Country\n" +
+                "(14) Find Potential Commercial Hosts - City\n" +
+                "(15) Rank Renter by Number of Bookings \n" +
+                "(16) Rank Renter by Number of Bookings - City\n" +
+                "(17) Rank Hosts by Cancellations in Past Year\n" +
+                "(18) Rank Renters by Cancellations in Past Year\n" +
+                "(19) Listing Noun Phrases");
         //take in user input and redirect
+        int option;
+        try {
+            option = scan.nextInt();
+            if (option == 0){
+                User.handleUserMainMenu(username);
+            } else if (option == 1){
+
+            } else if (option == 2){
+
+            } else if (option == 3){
+                searchByAddress();
+            } else if (option == 4){
+
+            } else if (option == 5){
+
+            } else if (option == 6){
+                numBookingsCity();
+            } else if (option == 7){
+                numBookingsCityPostal();
+            } else if (option == 8){
+                numListingsCountry();
+            } else if (option == 9){
+                numListingsCountryCity();
+            } else if (option == 10){
+                numListingsCountryCityPostal();
+            } else if (option == 11){
+                rankListingHostCountry();
+            } else if (option == 12){
+                rankListingHostCountryCity();
+            } else if (option == 13){
+                plus10percentListingsCountry();
+            } else if (option == 14){
+                plus10percentListingsCityCountry();
+            } else if (option == 15){
+                rankRenterBookings();
+            } else if (option == 16){
+                rankRenterBookingsCity();
+            } else if (option == 17){
+                rankHostCancel();
+            } else if (option == 18){
+                rankRenterCancel();
+            } else if (option == 19){
+
+            } else{
+                System.out.println("Invalid option. Please try again.\n");
+            }
+            mainMenu(con, user);
+        } catch (Exception e){
+            System.out.println("Invalid option. Must be integer. Try again.\n");
+            mainMenu(con, user);
+        }
 
     }
 
@@ -84,7 +159,7 @@ public class ReportsQueries {
             System.out.println(under);
             if (!rs.next()) {
                 System.out.println("No Entries. \n");
-                ReportsQueries.mainMenu(con);
+                ReportsQueries.mainMenu(con, user);
             }
 
             while (rs.next()) {
@@ -99,7 +174,7 @@ public class ReportsQueries {
         } catch (Exception e) {
             System.out.println("Unable to complete query.");
         }
-        mainMenu(con);
+        mainMenu(con, user);
 
     }
 
@@ -145,7 +220,7 @@ public class ReportsQueries {
         } catch (Exception e) {
             System.out.println("Unable to complete.");
         }
-        ReportsQueries.mainMenu(con);
+        ReportsQueries.mainMenu(con, user);
 
     }
 
@@ -187,7 +262,7 @@ public class ReportsQueries {
         } catch (Exception e) {
             System.out.println("Unable to complete.");
         }
-        ReportsQueries.mainMenu(con);
+        ReportsQueries.mainMenu(con, user);
 
     }
 
@@ -223,7 +298,7 @@ public class ReportsQueries {
         if (counter != -1) {
             System.out.println(String.format("There are %1 bookings in %2.\n", counter, country));
         }
-        mainMenu(con);
+        mainMenu(con, user);
     }
 
     //helper for getting total listings in a city+country
@@ -258,7 +333,7 @@ public class ReportsQueries {
         if (counter != -1) {
             System.out.println(String.format("There are %1 bookings in %2, %3.\n", counter, city, country));
         }
-        mainMenu(con);
+        mainMenu(con, user);
     }
 
     public static void numListingsCountryCityPostal() {
@@ -288,7 +363,7 @@ public class ReportsQueries {
         } catch (Exception e) {
             System.out.println("Unable to complete.");
         }
-        mainMenu(con);
+        mainMenu(con, user);
     }
 
 
@@ -313,10 +388,9 @@ public class ReportsQueries {
             s.setString(1, country);
             ResultSet rs = s.executeQuery();
 
-            int counter = 0;
             if (!rs.next()) {
                 System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con);
+                ReportsQueries.mainMenu(con, user);
             }
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
@@ -336,7 +410,7 @@ public class ReportsQueries {
         } catch (Exception e) {
             System.out.println("Unable to complete.");
         }
-        ReportsQueries.mainMenu(con);
+        ReportsQueries.mainMenu(con, user);
     }
 
     public static void rankListingHostCountryCity() {
@@ -364,7 +438,7 @@ public class ReportsQueries {
             int counter = 0;
             if (!rs.next()) {
                 System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con);
+                ReportsQueries.mainMenu(con, user);
             }
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
@@ -384,7 +458,7 @@ public class ReportsQueries {
         } catch (Exception e) {
             System.out.println("Unable to complete.");
         }
-        ReportsQueries.mainMenu(con);
+        ReportsQueries.mainMenu(con, user);
     }
 
 
@@ -415,7 +489,7 @@ public class ReportsQueries {
             int counter = 0;
             if (!rs.next()) {
                 System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con);
+                ReportsQueries.mainMenu(con, user);
             }
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
@@ -441,7 +515,7 @@ public class ReportsQueries {
         } catch (Exception e) {
             System.out.println("Unable to complete.");
         }
-        ReportsQueries.mainMenu(con);
+        ReportsQueries.mainMenu(con, user);
     }
 
     public static void plus10percentListingsCityCountry() {
@@ -472,7 +546,7 @@ public class ReportsQueries {
             int counter = 0;
             if (!rs.next()) {
                 System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con);
+                ReportsQueries.mainMenu(con, user);
             }
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
@@ -498,20 +572,189 @@ public class ReportsQueries {
         } catch (Exception e) {
             System.out.println("Unable to complete.");
         }
-        ReportsQueries.mainMenu(con);
+        ReportsQueries.mainMenu(con, user);
     }
 
 
     //rank renters by number of bookings in a specific time period
-    //same for city - only interested in 2+ bookings
-    // rank hosts/renters by largest number of cancellations
-    public static void distanceByLatAndLong(){
-        String query = "SELECT * ";
-        try{
-            PreparedStatement query1 = con.prepareStatement(query);
-        }catch (Exception E){
 
+    public static void rankRenterBookings(){
+        System.out.println("Starting date of reservation:");
+        String startDate = scan.next();
+        System.out.println("Ending date of reservation:");
+        String endDate = scan.next();
+
+        try {
+            PreparedStatement s = con.prepareStatement("select reserved.renterID, users.firstName, users.lastName, " +
+                    "count(reservationID) as total_bookings from users join reserved where users.sin = reserved.renterID" +
+                    "and (reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false");
+            s.setString(1, endDate);
+            s.setString(2, startDate);
+            ResultSet rs = s.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
+            }
+            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            System.out.println(String.format(format, "Renter ID", "First Name", "Last Name", "Count"));
+            String under = "_";
+            for (int i = 0; i < 60; i++) {
+                under += "_";
+            }
+            System.out.println(under);
+            while (rs.next()) {
+                int renterID = rs.getInt("reserved.renterID");
+                String firstName = rs.getString("users.firstName");
+                String lastName = rs.getString("users.lastName");
+                int count = rs.getInt("total_bookings");
+                System.out.println(String.format(format, renterID + "", firstName, lastName, count + ""));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Unable to complete.");
+        }
+        ReportsQueries.mainMenu(con, user);
+
+    }
+
+
+    //same for city - only interested in 2+ bookings
+
+    public static void rankRenterBookingsCity(){
+        System.out.println("Starting date of reservation:");
+        String startDate = scan.next();
+        System.out.println("Ending date of reservation:");
+        String endDate = scan.next();
+
+        System.out.println("City:");
+        String city = scan.next();
+
+        System.out.println("Country:");
+        String country = scan.next();
+
+        try {
+            PreparedStatement s = con.prepareStatement("select reserved.renterID, users.firstName, users.lastName, " +
+                    "count(reservationID) as total_bookings from users join reserved join located join address " +
+                    "where users.sin = reserved.renterID and reserved.listID = located.listID and " +
+                    "address.addressID = located.addressID" +
+                    "and (reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false " +
+                    "and address.city = ? and address.country = ?");
+            s.setString(1, endDate);
+            s.setString(2, startDate);
+            s.setString(3, city);
+            s.setString(4, country);
+            ResultSet rs = s.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
+            }
+            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            System.out.println(String.format(format, "Renter ID", "First Name", "Last Name", "Count"));
+            String under = "_";
+            for (int i = 0; i < 60; i++) {
+                under += "_";
+            }
+            System.out.println(under);
+            int counter = 0;
+            while (rs.next()) {
+                int renterID = rs.getInt("reserved.renterID");
+                String firstName = rs.getString("users.firstName");
+                String lastName = rs.getString("users.lastName");
+                int count = rs.getInt("total_bookings");
+                if (count >= 2){
+                    System.out.println(String.format(format, renterID + "", firstName, lastName, count + ""));
+                }
+            }
+            if (counter == 0){
+                System.out.println("No Entries.\n");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Unable to complete.");
+        }
+        ReportsQueries.mainMenu(con, user);
+    }
+
+
+    // rank hosts by largest number of cancellations
+
+    public static void rankHostCancel(){
+        try {
+            PreparedStatement s = con.prepareStatement("select reserved.hostID, users.firstName, users.lastName," +
+                    "count(reservationID) as total from reserved join users where " +
+                    "statusAvailable = true and users.sin = reserved.hostID and startDate >= 2021-08-01" +
+                    "group by reserved.hostID order by total DESC");
+            ResultSet rs = s.executeQuery();
+
+
+            if (!rs.next()){
+                System.out.println("No Entries.\n");
+                mainMenu(con, user);
+            }
+            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Total Cancellations"));
+            String under = "_";
+            for (int i = 0; i < 60; i++) {
+                under += "_";
+            }
+            System.out.println(under);
+            while (rs.next()) {
+                int hostID = rs.getInt("reserved.hostID");
+                String firstName = rs.getString("users.firstName");
+                String lastName = rs.getString("users.lastName");
+                int count = rs.getInt("total");
+                System.out.println(String.format(format, hostID + "", firstName, lastName, count + ""));
+            }
+
+
+
+        } catch (Exception e){
+            System.out.println("Unable to complete query.");
+            mainMenu(con, user);
         }
     }
+
+
+    // rank renters by largest number of cancellations
+
+    public static void rankRenterCancel(){
+        try {
+            PreparedStatement s = con.prepareStatement("select reserved.renterID, users.firstName, users.lastName," +
+                    "count(reservationID) as total from reserved join users where " +
+                    "statusAvailable = true and users.sin = reserved.renterID and startDate >= 2021-08-01" +
+                    "group by reserved.renterID order by total DESC");
+            ResultSet rs = s.executeQuery();
+
+
+            if (!rs.next()){
+                System.out.println("No Entries.\n");
+                mainMenu(con, user);
+            }
+            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            System.out.println(String.format(format, "Renter ID", "First Name", "Last Name", "Total Cancellations"));
+            String under = "_";
+            for (int i = 0; i < 60; i++) {
+                under += "_";
+            }
+            System.out.println(under);
+            while (rs.next()) {
+                int renterID = rs.getInt("reserved.renterID");
+                String firstName = rs.getString("users.firstName");
+                String lastName = rs.getString("users.lastName");
+                int count = rs.getInt("total");
+                System.out.println(String.format(format, renterID + "", firstName, lastName, count + ""));
+            }
+
+
+
+        } catch (Exception e){
+            System.out.println("Unable to complete query.");
+            mainMenu(con, user);
+        }
+    }
+
+
 
 }
