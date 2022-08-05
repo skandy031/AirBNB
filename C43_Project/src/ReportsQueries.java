@@ -506,8 +506,12 @@ public class ReportsQueries {
     //same for city - only interested in 2+ bookings
     // rank hosts/renters by largest number of cancellations
     public static void distanceByLatAndLong(){
-        String
-        PreparedStatement query1 = con.prepareStatement(query);
+        String query = "SELECT * ";
+        try{
+            PreparedStatement query1 = con.prepareStatement(query);
+        }catch (Exception E){
+
+        }
     }
 
 }
