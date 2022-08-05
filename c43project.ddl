@@ -29,7 +29,7 @@ cvc         integer             not null,
 CHECK ( cvc < 1000 and cvc > 99 ),
 CHECK ( expiryMonth > 0 and expiryMonth <= 12 ),
 CHECK ( expiryYear > 2022 or (expiryYear = 2022 and expiryMonth > 8)),
-CHECK ( ccNumber > 999999999999999 and ccNumber <= 99999999999999999 )
+CHECK ( ccNumber > 999999999999999 and ccNumber <= 9999999999999999 )
 );
 
 create table Listing
@@ -61,30 +61,30 @@ create table Amenities
 (
     amenityID           integer not null primary key auto_increment,
 --     list of booleans with amenities
-    wifi                boolean not null,
-    washer              boolean not null,
-    ac                  boolean not null,
-    heating             boolean not null,
-    tv                  boolean not null,
-    iron                boolean not null,
-    kitchen             boolean not null,
-    dryer               boolean not null,
-    workspace           boolean not null,
-    hairDryer           boolean not null,
-    pool                boolean not null,
-    parking             boolean not null,
-    crib                boolean not null,
-    grill               boolean not null,
-    indoorFireplace     boolean not null,
-    hotTub              boolean not null,
-    evCharger           boolean not null,
-    gym                 boolean not null,
-    breakfast           boolean not null,
-    smoking             boolean not null,
-    beachfront          boolean not null,
-    waterfront          boolean not null,
-    smokeAlarm          boolean not null,
-    carbonMonoxideAlarm boolean not null
+    wifi                boolean not null DEFAULT FALSE,
+    washer              boolean not null DEFAULT FALSE,
+    ac                  boolean not null DEFAULT FALSE,
+    heating             boolean not null DEFAULT FALSE,
+    tv                  boolean not null DEFAULT FALSE,
+    iron                boolean not null DEFAULT FALSE,
+    kitchen             boolean not null DEFAULT FALSE,
+    dryer               boolean not null DEFAULT FALSE,
+    workspace           boolean not null DEFAULT FALSE,
+    hairDryer           boolean not null DEFAULT FALSE,
+    pool                boolean not null DEFAULT FALSE,
+    parking             boolean not null DEFAULT FALSE,
+    crib                boolean not null DEFAULT FALSE,
+    grill               boolean not null DEFAULT FALSE,
+    indoorFireplace     boolean not null DEFAULT FALSE,
+    hotTub              boolean not null DEFAULT FALSE,
+    evCharger           boolean not null DEFAULT FALSE,
+    gym                 boolean not null DEFAULT FALSE,
+    breakfast           boolean not null DEFAULT FALSE,
+    smoking             boolean not null DEFAULT FALSE,
+    beachfront          boolean not null DEFAULT FALSE,
+    waterfront          boolean not null DEFAULT FALSE,
+    smokeAlarm          boolean not null DEFAULT FALSE,
+    carbonMonoxideAlarm boolean not null DEFAULT FALSE
 );
 
 
@@ -131,10 +131,3 @@ listID    integer primary key not null references Listing (listID)
 #     primary key (listID, amenityID)
 );
 
-
-create table Provides
-(
-    amenityID integer not null references Amenities (amenityID),
-    listID    integer primary key not null references Listing (listID)
-#     primary key (listID, amenityID)
-);
