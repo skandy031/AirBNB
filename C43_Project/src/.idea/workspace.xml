@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="14e37f36-14e9-41b8-ab88-41681dd4cecb" name="Changes" comment="updated ddl amenities with default equals to False">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/Driver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Host.java" beforeDir="false" afterPath="$PROJECT_DIR$/Host.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ReportsQueries.java" beforeDir="false" afterPath="$PROJECT_DIR$/ReportsQueries.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../c43project.ddl" beforeDir="false" afterPath="$PROJECT_DIR$/../../c43project.ddl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

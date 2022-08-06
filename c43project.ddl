@@ -39,7 +39,7 @@ create table Listing
     longitude   double      not null,
     latitude    double      not null,
     price       double      not null,
-    CHECK ( latitude >= -85.0 and latitude <= 85.0 ),
+    CHECK ( latitude >= -90.0 and latitude <= 90.0 ),
     CHECK ( longitude >= -180.0 and longitude <= 180.0 )
 );
 
@@ -126,15 +126,8 @@ create table Located
 
 create table Provides
 (
-    amenityID integer             not null references Amenities (amenityID),
-    listID    integer primary key not null references Listing (listID)
+amenityID integer             not null references Amenities (amenityID),
+    listID    integer not null references Listing (listID)
 #     primary key (listID, amenityID)
 );
 
-
-create table Provides
-(
-    amenityID integer not null references Amenities (amenityID),
-    listID    integer primary key not null references Listing (listID)
-#     primary key (listID, amenityID)
-);

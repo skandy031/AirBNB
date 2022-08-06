@@ -1,9 +1,6 @@
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Host {
     static Scanner scan = new Scanner(System.in);
@@ -51,91 +48,95 @@ public class Host {
 //        scan.close();
 //    }
 
+
     public static void createListing(){
-        Hashtable<Integer, String> listingTypes  = new Hashtable<Integer, String>(){{put(1,"Full house");
+        String query = "";
+        ResultSet rs;
+        PreparedStatement query1;
+        Double lon,lat, price = 0.0;
+        Integer sNo,unitNo, opt = 0;
+        List x = new ArrayList<>();
+        Hashtable<Integer, String> listingTypes  = new Hashtable<Integer, String>(){
+            {
+            put(1,"Full house");
             put(2, "Apartment");
             put(3, "Room");}};
-
+        String sName,city,province, country, code ="";
         try {
-            System.out.println("Listing Type:");
-            System.out.println("  (1) Full house");
-            System.out.println("  (2) Apartment");
-            System.out.println("  (3) Room");
-            Integer opt = scan.nextInt();
-            System.out.println("Longitude:");
-            Double lon = scan.nextDouble();
-            System.out.println("Latitude:");
-            Double lat = scan.nextDouble();
-            System.out.println("Price");
-            Double price = scan.nextDouble();
-            // Insert into Database
-            System.out.println(user);
-            String query = "INSERT INTO Listing (hostID,listingType,longitude,latitude,price) VALUES (?,?,?,?,?)";
-            PreparedStatement query1 = con.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
-            query1.setInt(1, user);
-            query1.setString(2, listingTypes.get(opt));
-            query1.setDouble(3, lon);
-            query1.setDouble(4, lat);
-            query1.setDouble(5, price);
-            query1.executeUpdate();
-            ResultSet rs = query1.getGeneratedKeys();
-            rs.next();
-            Integer listingKey = (rs.getInt(1));
-//            //Get address
-            System.out.println("Street Number:");
-            Integer sNo = scan.nextInt();
-            System.out.println("Street Name:");
-            String sName = scan.next();
-            System.out.println("City:");
-            String city = scan.next();
-            System.out.println("Province:");
-            String province = scan.next();
-            System.out.println("Postal Code:");
-            String code = scan.next();
-            System.out.println("Unit Number:");
-            Integer unitNo = scan.nextInt();
+            while(true) {
+                System.out.println("Listing Type:");
+                System.out.println("  (1) Full house");
+                System.out.println("  (2) Apartment");
+                System.out.println("  (3) Room");
+                opt = scan.nextInt();
+                if (opt != 1 || opt != 2 || opt != 3) {
+                    System.out.println("Invalid Option");
+                    continue;
+                }
+                System.out.println("Longitude:");
+                lon = scan.nextDouble();
+                if (lon.doubleValue() > 180 || lon.doubleValue() < -180){
+                    System.out.println("Invalid Option");
+                    continue;
+                }
+                System.out.println("Latitude:");
+                lat = scan.nextDouble();
+                if (lat.doubleValue() > 90 || lat.doubleValue() < -90){
+                    System.out.println("Invalid Option");
+                    continue;
+                }
+                System.out.println("Price");
+                price = scan.nextDouble();
+                // Insert into Database
+                //            System.out.println(user);
 
-            //Insert into address table
-            query = "INSERT INTO Address (streetNo, streetName, city, province, postalCode, unitNo) VALUES (?,?,?,?,?,?)";
-            PreparedStatement query2 = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            query2.setInt(1, sNo);
-            query2.setString(2, sName);
-            query2.setString(3,city);
-            query2.setString(4,province);
-            query2.setString(5, code);
-            query2.setInt(6,unitNo);
-            query2.executeUpdate();
-            rs = query2.getGeneratedKeys();
-            rs.next();
-            Integer addressKey = rs.getInt(1);
-//
-//
-            System.out.println("Choose Amenities:");
-            System.out.println("(1) Wifi, (2) Washer, (3) Air Conditioning, (4) Heating,\n"         +
-                "(5) Television, (6) Iron, (7) Kitchen, (8) Dryer, (9) Workspace,\n" +
-                "(10) Hair Dryer, (11) Pool, (12) Parking, (13) Crib, (14) Grill,\n" +
-                "(15) Indoor Fireplace, (16) Hot Tub, (17) EV Charger, (18) Gym,\n"   +
-                "(19) Breakfast, (20) Smoking, (21) Beachfront, (22) Waterfront\n"   +
-                "(23) Smoke Alarm, (24) Carbonmononxide Alarm");
-            System.out.println("Type 0 to stop");
-            int bre = 0;
-            List x = new ArrayList<>();
-            while(bre == 0){
-                System.out.println(x);
-                Integer option = scan.nextInt();
-                if(option == 0){
-                    bre = 1;
+                System.out.println("Street Number:");
+                sNo = scan.nextInt();
+                System.out.println("Street Name:");
+                 sName = scan.next();
+                System.out.println("City:");
+                 city = scan.next();
+                System.out.println("Province:");
+                 province = scan.next();
+                System.out.println("Country:");
+                country = scan.next();
+                System.out.println("Postal Code:");
+                 code = scan.next();
+
+                if(code.length() >=6){
+                    System.out.println("Postal/Zip code too long");
+                    continue;
                 }
-                else{
-                    if(!x.contains(option)){
-                        x.add(option);
-                    }
-                    else{
-                        System.out.println("Option already selected.");
+                System.out.println("Unit Number:");
+                unitNo = scan.nextInt();
+
+                //Insert into address table
+                //
+                //
+                System.out.println("Choose Amenities:");
+                System.out.println("(1) Wifi, (2) Washer, (3) Air Conditioning, (4) Heating,\n" +
+                    "(5) Television, (6) Iron, (7) Kitchen, (8) Dryer, (9) Workspace,\n" +
+                    "(10) Hair Dryer, (11) Pool, (12) Parking, (13) Crib, (14) Grill,\n" +
+                    "(15) Indoor Fireplace, (16) Hot Tub, (17) EV Charger, (18) Gym,\n" +
+                    "(19) Breakfast, (20) Smoking, (21) Beachfront, (22) Waterfront\n" +
+                    "(23) Smoke Alarm, (24) Carbonmononxide Alarm");
+                System.out.println("Type 0 to stop");
+                int bre = 0;
+                while (bre == 0) {
+                    System.out.println(x);
+                    Integer option = scan.nextInt();
+                    if (option == 0) {
+                        bre = 1;
+                    } else {
+                        if (!x.contains(option)) {
+                            x.add(option);
+                        } else {
+                            System.out.println("Option already selected.");
+                        }
                     }
                 }
+                break;
             }
-            System.out.println(x);
             String amenQuery = "INSERT INTO Amenities (wifi, washer, ac, heating, tv, iron," +
                 "kitchen,dryer,workspace, hairDryer, pool, parking,crib, grill, indoorFireplace, hotTub," +
                 "evCharger, gym, breakfast, smoking, beachfront, waterfront, smokeAlarm, carbonMonoxideAlarm)" +
@@ -152,7 +153,31 @@ public class Host {
                 amenValues += b;
 
             }
+            query = "INSERT INTO Listing (hostID,listingType,longitude,latitude,price) VALUES (?,?,?,?,?)";
+            query1 = con.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
+            query1.setInt(1, user);
+            query1.setString(2, listingTypes.get(opt));
+            query1.setDouble(3, lon);
+            query1.setDouble(4, lat);
+            query1.setDouble(5, price);
+            query1.executeUpdate();
+            rs = query1.getGeneratedKeys();
+            rs.next();
+            Integer listingKey = (rs.getInt(1));
 
+            query = "INSERT INTO Address (streetNo, streetName, city, country,province, postalCode, unitNo) VALUES (?,?,?,?,?,?)";
+            PreparedStatement query2 = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            query2.setInt(1, sNo);
+            query2.setString(2, sName);
+            query2.setString(3,city);
+            query2.setString(4,province);
+            query2.setString(5,country);
+            query2.setString(6, code);
+            query2.setInt(7,unitNo);
+            query2.executeUpdate();
+            rs = query2.getGeneratedKeys();
+            rs.next();
+            Integer addressKey = rs.getInt(1);
 
             query3.executeUpdate();
             rs = query3.getGeneratedKeys();
@@ -174,6 +199,7 @@ public class Host {
             handleHost(user, con);
         }catch(Exception e) {
             System.out.println(e);
+            createListing();
         }
     }
     public static void viewListing(){
@@ -281,6 +307,7 @@ public class Host {
         System.out.println("(4) Change Availability");
         System.out.println("(5) Delete listing");
         try {
+
             Integer opt = scan.nextInt();
             if (opt == 1) createListing();
             else if (opt == 2) viewListing();

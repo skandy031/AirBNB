@@ -33,7 +33,7 @@ public class Driver {
             } else if (option == 2) {
                 User.createAccount(con);
             } else if (option == 3) {
-                ReportsQueries.mainMenu(con);
+                ReportsQueries.mainMenu(con,2);
             } else {
                 System.out.println("Invalid option.\n");
                 mainMenu();
