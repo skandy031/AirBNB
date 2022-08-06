@@ -52,11 +52,10 @@ public class Driver {
 
             if (!con.isClosed())
                 System.out.println("Successfully connected to MySQL server using TCP/IP...");
+            mainMenu();
 
         } catch (Exception e) {
             System.err.println("Exception: " + e.getMessage());
         }
-
-        mainMenu();
     }
 }

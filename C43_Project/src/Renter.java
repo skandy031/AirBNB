@@ -180,8 +180,8 @@ public class Renter {
         try {
 
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s | %5$-10s | %6$-15s ";
-            System.out.println(String.format(format, "Listing ID", "Host ID", "Listing Type",
-                    "Longitude", "Latitude", "Price"));
+            System.out.println(String.format(format, "Listing ID", "House Number", "Street Name",
+                    "City", "Unit Number", "Price"));
             String under = "_";
             for (int i = 0; i < 90; i++){
                 under += "_";
@@ -191,17 +191,35 @@ public class Renter {
             while (rs.next()){
                 int listID = rs.getInt("listID");
                 listingSet.add(listID);
-                int hostID = rs.getInt("hostID");
+//                int hostID = rs.getInt("hostID");
                 int price = rs.getInt("price");
-                double longitude = rs.getDouble("longitude");
-                double latitude = rs.getDouble("latitude");
-                String listingType = rs.getString("listingType");
-                System.out.println(String.format(format, listID+"", hostID+"", listingType,
-                        longitude+"", latitude+"", price+""));
+//                double longitude = rs.getDouble("longitude");
+//                double latitude = rs.getDouble("latitude");
+//                String listingType = rs.getString("listingType");
 
+                //search into listing join located join reserved table for address
+                int streetNo;
+                String streetName;
+                String city;
+                int unitNo;
+                PreparedStatement s1 = con.prepareStatement("select address.streetNo, address.streetName, " +
+                        "address.city, address.unitNo from listing join located " +
+                        "join address where listing.listID = located.listID and located.addressID = " +
+                        "address.addressID and listing.listID = ?");
+                s1.setInt(1, listID);
+                ResultSet rs1 = s1.executeQuery();
+                if (rs.next()){
+                    streetNo = rs1.getInt("address.streetNo");
+                    streetName = rs1.getString("address.streetName");
+                    city = rs1.getString("address.city");
+                    unitNo = rs1.getInt("address.unitNo");
+                    System.out.println(String.format(format, listID+"", streetNo+"", streetName,
+                            city, unitNo+"", price+""));
+                }
             }
         } catch (Exception e){
-            System.out.println(e);
+            System.out.println("Unable to complete. Please try again.");
+            Renter.handleRenter(username);
         }
         return listingSet;
     }
@@ -365,6 +383,9 @@ public class Renter {
         System.out.println("City:");
         String city = scan.next();
 
+        System.out.println("Country:");
+        String country = scan.next();
+
         //3 options
         // not in reserved -> add to set
         // in reserved with no overlapping dates
@@ -372,16 +393,18 @@ public class Renter {
 
 
         try {
-            PreparedStatement s = con.prepareStatement("select * from listing where city = ? and listID " +
-                    "NOT IN (select Reserved.listID from reserved) UNION" +
-                    "select * from listing where city = ? and " +
+            PreparedStatement s = con.prepareStatement("select * from listing where city = ? and country = ? " +
+                    "and listID NOT IN (select Reserved.listID from reserved) UNION" +
+                    "select * from listing where city = ? and country = ? and " +
                     "NOT IN ( select listID, hostID, listingType, longitude, latitude, price from listing join " +
                     "reserved where listing.listID = reserved.listID and " +
                     "(reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false");
             s.setString(1, city);
-            s.setString(2, city);
-            s.setString(3, endDate);
-            s.setString(4, startDate);
+            s.setString(2, country);
+            s.setString(3, city);
+            s.setString(4, country);
+            s.setString(5, endDate);
+            s.setString(6, startDate);
             ResultSet rs = s.executeQuery();
             HashSet<Integer> listingSet = printListingOptions(rs);
 

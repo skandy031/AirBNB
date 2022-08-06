@@ -93,6 +93,40 @@ public class ReportsQueries {
 
     //queries
     //by distance
+
+    public static void findListingByCoord(){
+        Double lon, lat,distance = 0.0;
+
+        while(true){
+            System.out.println("Latitude:");
+            lon = scan.nextDouble();
+            System.out.println("Longitude:");
+            lat = scan.nextDouble();
+            if(lon >= -85 || lon <= 85 || lat >=-180 || lat <= 180 ) break;
+            else System.out.println("Values out of range for longitude or latitude");
+            System.out.println("Distance (km):");
+            distance = scan.nextDouble();
+            if(distance > 1) break;
+            else System.out.println("Distance can't be negative");
+        }
+        String query = "SELECT * \n" +
+                "FROM Listing \n" +
+                "WHERE ST_Distance_Sphere(point(?,?), point(longitude,latitude))/1000 <= ?";
+        try{
+            PreparedStatement query1 = con.prepareStatement(query);
+            query1.setDouble(1,lon);
+            query1.setDouble(2,lat);
+            query1.setDouble(3,distance);
+            ResultSet rs = query1.executeQuery();
+        }catch(Exception E){
+            System.out.println(E);
+        }
+
+
+
+    }
+
+
     //add search mechanics
 
     // query by address
@@ -622,10 +656,10 @@ public class ReportsQueries {
     //same for city - only interested in 2+ bookings
 
     public static void rankRenterBookingsCity(){
-        System.out.println("Starting date of reservation:");
-        String startDate = scan.next();
-        System.out.println("Ending date of reservation:");
-        String endDate = scan.next();
+//        System.out.println("Starting date of reservation:");
+//        String startDate = scan.next();
+//        System.out.println("Ending date of reservation:");
+//        String endDate = scan.next();
 
         System.out.println("City:");
         String city = scan.next();
@@ -640,8 +674,8 @@ public class ReportsQueries {
                     "address.addressID = located.addressID" +
                     "and (reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false " +
                     "and address.city = ? and address.country = ?");
-            s.setString(1, endDate);
-            s.setString(2, startDate);
+            s.setString(1, "2022-08-08");
+            s.setString(2, "2021-08-08");
             s.setString(3, city);
             s.setString(4, country);
             ResultSet rs = s.executeQuery();
@@ -755,36 +789,6 @@ public class ReportsQueries {
         }
     }
 
-    public static void findListingByCoord(){
-        Double lon, lat,distance = 0.0;
 
-        while(true){
-            System.out.println("Latitude:");
-            lon = scan.nextDouble();
-            System.out.println("Longitude:");
-            lat = scan.nextDouble();
-            if(lon >= -85 || lon <= 85 || lat >=-180 || lat <= 180 ) break;
-            else System.out.println("Values out of range for longitude or latitude");
-            System.out.println("Distance (km):");
-            distance = scan.nextDouble();
-            if(distance > 1) break;
-            else System.out.println("Distance can't be negative");
-        }
-        String query = "SELECT * \n" +
-                       "FROM Listing \n" +
-                       "WHERE ST_Distance_Sphere(point(?,?), point(longitude,latitude))/1000 <= ?";
-        try{
-            PreparedStatement query1 = con.prepareStatement(query);
-            query1.setDouble(1,lon);
-            query1.setDouble(2,lat);
-            query1.setDouble(3,distance);
-            ResultSet rs = query1.executeQuery();
-        }catch(Exception E){
-            System.out.println(E);
-        }
-
-
-
-    }
 
 }
