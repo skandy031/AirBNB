@@ -18,7 +18,7 @@ public class ReportsQueries {
         user = username;
 
         //display all options
-        System.out.println("Choose an option:\n" +
+        System.out.println("\nChoose an option:\n" +
                 "(0) Exit\n" +
                 "(1) Search by Distance\n" +
                 "(2) Search by Postal Code\n" +
@@ -44,7 +44,7 @@ public class ReportsQueries {
         try {
             option = scan.nextInt();
             if (option == 0) {
-                User.handleUserMainMenu(username);
+                User.handleUserMainMenu(username, con);
             } else if (option == 1) {
                 findListingByCoord();
             } else if (option == 2) {
@@ -143,16 +143,20 @@ public class ReportsQueries {
                 System.out.println("Invalid. Must be integer.");
             }
         }
+//        scan = null;
+        scan = new Scanner(System.in);
         System.out.println("Street Name:");
         String streetName = scan.nextLine();
         System.out.println("City:");
-        String city = scan.next();
+        String city = scan.nextLine();
         System.out.println("Province/State:");
-        String prov = scan.next();
+        String prov = scan.nextLine();
         System.out.println("Country:");
-        String country = scan.next();
-        System.out.println("Country:");
-        String postalCode = scan.next();
+        String country = scan.nextLine();
+        System.out.println("Postal Code:");
+        String postalCode = scan.nextLine();
+
+
         System.out.println("Unit Number (If no Unit Number, type -1):");
         int unitNumber;
         while (true) {
@@ -165,45 +169,55 @@ public class ReportsQueries {
         }
 
         try {
-            PreparedStatement s = con.prepareStatement("select listing.listID, listingType, price, streetNo, " +
+            String query = "select listing.listID, listingType, price, streetNo, " +
                     "streetName, city, province, country, postalcode, unitNo from listing join located join " +
                     "address where " + "listing.listid = located.listid and address.addressid = located.addressid and " +
-                    "streetNo = ? and streetName = ? and city = ? and province = ? and country = ? and unitNo = ? " +
-                    "and postalCode = ?");
+                    "streetNo = ? and streetName = ? and city = ? and province = ? and country = ? " +
+                    "and postalCode = ? and unitNo = ";
+
+            PreparedStatement s;
+            if (unitNumber < 0) {
+                query += "null";
+                s = con.prepareStatement(query);
+
+            } else {
+                query += "?";
+                s = con.prepareStatement(query);
+                s.setInt(7, unitNumber);
+            }
             s.setInt(1, houseNumber);
             s.setString(2, streetName);
             s.setString(3, city);
             s.setString(4, prov);
             s.setString(5, country);
-            if (unitNumber == -1) {
-                s.setNull(4, Types.INTEGER);
-            } else {
-                s.setInt(6, unitNumber);
-            }
-            s.setString(7, postalCode);
+            s.setString(6, postalCode);
+
+
 
             ResultSet rs = s.executeQuery();
 
-            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s | %5$-10s | %6$-15s | %7$-15s " +
-                    "| %8$-15s | %9$-15s | %10$-15s";
+            String format = "%1$-8s| %2$-20s | %3$-10s | %4$-15s | %5$-10s | %6$-10s | %7$-15s " +
+                    "| %8$-10s | %9$-15s | %10$-15s";
             System.out.println(String.format(format, "ListID", "ListingType", "Price",
                     "House Number", "Street Name", "City", "Province", "Country", "Postal Code", "Unit No."));
             String under = "_";
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 150; i++) {
                 under += "_";
             }
             System.out.println(under);
-            if (!rs.next()) {
-                System.out.println("No Entries. \n");
-                ReportsQueries.mainMenu(con, user);
-            }
 
+            int counter = 0;
             while (rs.next()) {
                 int listID = rs.getInt("listID");
                 String listType = rs.getString("listingType");
                 int price = rs.getInt("price");
                 System.out.println(String.format(format, listID + "", listType, price + "",
                         houseNumber + "", streetName, city, prov, country, postalCode, unitNumber + ""));
+                counter++;
+            }
+            if (counter == 0) {
+                System.out.println("No Entries. \n");
+                ReportsQueries.mainMenu(con, user);
             }
 
 
@@ -219,9 +233,9 @@ public class ReportsQueries {
 
     public static void searchByTime(){
         System.out.println("Starting date:");
-        String startDate = scan.next();
+        String startDate = scan.nextLine();
         System.out.println("Ending date:");
-        String endDate = scan.next();
+        String endDate = scan.nextLine();
         String query = "((select listing.listid from listing where listid not in " +
                 "(select listid from reserved)) union (select listing.listID from listing " +
                 "join reserved where listing.listid = reserved.listid and listing.listid not in " +
@@ -306,35 +320,35 @@ public class ReportsQueries {
 
         //search by country, city, postal code
         System.out.println("Search by country (y/n):");
-        String option = scan.next();
+        String option = scan.nextLine();
         if (option.toLowerCase() == "y") {
             System.out.println("Country:");
-            String country = scan.next();
+            String country = scan.nextLine();
             query += " and address.country = '" + country + "'";
 
             System.out.println("Add city to search (y/n):");
-            option = scan.next();
+            option = scan.nextLine();
             if (option.toLowerCase() == "y") {
                 System.out.println("Country:");
-                String city = scan.next();
+                String city = scan.nextLine();
                 query += " and address.city = '" + city + "'";
 
                 System.out.println("Add postal code to search (y/n):");
-                option = scan.next();
+                option = scan.nextLine();
                 if (option.toLowerCase() == "y") {
                     System.out.println("Postal Code:");
-                    String postal = scan.next();
+                    String postal = scan.nextLine();
                     query += " and address.postalCode = '" + postal + "'";
 
                     System.out.println("Add street name to search (y/n):");
-                    option = scan.next();
+                    option = scan.nextLine();
                     if (option.toLowerCase() == "y"){
                         System.out.println("Street Name:");
-                        String streetName = scan.next();
+                        String streetName = scan.nextLine();
                         query += " and address.streetName = '" + streetName + "'";
 
                         System.out.println("Add house number to search (y/n):");
-                        option = scan.next();
+                        option = scan.nextLine();
                         if (option.toLowerCase() == "y"){
                             int houseNum;
                             while (true){
@@ -358,7 +372,7 @@ public class ReportsQueries {
 
         //search by price
         System.out.println("Add price range to search (y/n):");
-        option = scan.next();
+        option = scan.nextLine();
         if (option == "y") {
             while (true) {
                 int lower, upper;
@@ -377,17 +391,17 @@ public class ReportsQueries {
 
         //search by listing type
         System.out.println("Search by listing type (y/n):");
-        option = scan.next();
+        option = scan.nextLine();
         if (option == "y") {
             System.out.println("Listing Type:");
-            String listType = scan.next();
+            String listType = scan.nextLine();
             query += " and listing.listingType = '" + listType + "'";
         }
 
 
         //search by amenities
         System.out.println("Search by amenities:");
-        option = scan.next();
+        option = scan.nextLine();
         if (option.toLowerCase() == "y"){
             ArrayList<Integer> choices = new ArrayList<>();
             ArrayList<String> names = new ArrayList<>(List.of("wifi", "washer", "ac", "heating", "tv", "iron", "kitchen",
@@ -428,13 +442,13 @@ public class ReportsQueries {
 
         //search by time frame
         System.out.println("Add time frame availability to search (y/n):");
-        option = scan.next();
+        option = scan.nextLine();
         if (option.toLowerCase() == "y"){
             query = "(" + query + ")";
             System.out.println("Starting date:");
-            String startDate = scan.next();
+            String startDate = scan.nextLine();
             System.out.println("Ending date:");
-            String endDate = scan.next();
+            String endDate = scan.nextLine();
             query += " intersects ((select listing.listid from listing where listid not in " +
                     "(select listid from reserved)) union (select listing.listID from listing " +
                     "join reserved where listing.listid = reserved.listid and listing.listid not in " +
@@ -468,9 +482,9 @@ public class ReportsQueries {
     // num of bookings in date range by city, country
     public static void numBookingsCity() {
         System.out.println("Starting date of reservation:");
-        String startDate = scan.next();
+        String startDate = scan.nextLine();
         System.out.println("Ending date of reservation:");
-        String endDate = scan.next();
+        String endDate = scan.nextLine();
 
 
         try {
@@ -485,10 +499,7 @@ public class ReportsQueries {
             ResultSet rs = s.executeQuery();
 
             //print out all the listings
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con, user);
-            }
+            int counter = 0;
             String format = "%1$-8s| %2$-10s | %3$-10s";
             System.out.println(String.format(format, "City", "Country", "Count"));
             String under = "_";
@@ -501,6 +512,11 @@ public class ReportsQueries {
                 String country = rs.getString("country");
                 int totalCount = rs.getInt("total");
                 System.out.println(String.format(format, city, country, totalCount+""));
+                counter++;
+            }
+            if (counter == 0) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
             }
 
 
@@ -513,9 +529,9 @@ public class ReportsQueries {
     //num of bookings in date range by city, country, postal code
     public static void numBookingsCityPostal() {
         System.out.println("Starting date of reservation:");
-        String startDate = scan.next();
+        String startDate = scan.nextLine();
         System.out.println("Ending date of reservation:");
-        String endDate = scan.next();
+        String endDate = scan.nextLine();
 
 
         try {
@@ -530,10 +546,7 @@ public class ReportsQueries {
             ResultSet rs = s.executeQuery();
 
             //print out all the listings
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con, user);
-            }
+            int counter = 0;
             String format = "%1$-8s| %2$-10s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "City", "Country", "Postal Code", "Count"));
             String under = "_";
@@ -547,6 +560,11 @@ public class ReportsQueries {
                 String postal = rs.getString("postalCode");
                 int totalCount = rs.getInt("total");
                 System.out.println(String.format(format, city, country, postal, totalCount+""));
+                counter++;
+            }
+            if (counter == 0) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
             }
 
 
@@ -568,10 +586,7 @@ public class ReportsQueries {
             ResultSet rs = s.executeQuery();
 
             //print out all the listings
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con, user);
-            }
+            int counter = 0;
             String format = "%1$-8s| %2$-10s";
             System.out.println(String.format(format, "Country", "Count"));
             String under = "_";
@@ -583,6 +598,11 @@ public class ReportsQueries {
                 String country = rs.getString("country");
                 int totalCount = rs.getInt("total");
                 System.out.println(String.format(format, country, totalCount+""));
+                counter++;
+            }
+            if (counter == 0) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
             }
 
         } catch (Exception e){
@@ -599,10 +619,7 @@ public class ReportsQueries {
             ResultSet rs = s.executeQuery();
 
             //print out all the listings
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con, user);
-            }
+
             String format = "%1$-8s| %2$-10s | %3$-10s";
             System.out.println(String.format(format, "Country", "City", "Count"));
             String under = "_";
@@ -610,11 +627,17 @@ public class ReportsQueries {
                 under += "_";
             }
             System.out.println(under);
+            int counter = 0;
             while (rs.next()) {
                 String country = rs.getString("country");
                 String city = rs.getString("city");
                 int totalCount = rs.getInt("total");
                 System.out.println(String.format(format, country, city, totalCount+""));
+                counter++;
+            }
+            if (counter == 0) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
             }
 
         } catch (Exception e){
@@ -641,6 +664,7 @@ public class ReportsQueries {
             for (int i = 0; i < 50; i++) {
                 under += "_";
             }
+            int counter = 0;
             System.out.println(under);
             while (rs.next()) {
                 String country = rs.getString("country");
@@ -648,6 +672,11 @@ public class ReportsQueries {
                 String postalCode = rs.getString("postalCode");
                 int totalCount = rs.getInt("total");
                 System.out.println(String.format(format, country, city, postalCode, totalCount+""));
+                counter++;
+            }
+            if (counter == 0) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
             }
 
         } catch (Exception e){
@@ -660,8 +689,8 @@ public class ReportsQueries {
     //rank hosts by number of listings in country and city
 
     public static void rankListingHostCountry() {
-        System.out.println("Country");
-        String country = scan.next();
+        System.out.println("Country:");
+        String country = scan.nextLine();
 
         try {
 //            PreparedStatement s = con.prepareStatement("select listing.hostID, users.firstName, users.lastName, " +
@@ -669,32 +698,34 @@ public class ReportsQueries {
 //                    "where listing.hostID = users.sin and listing.listID = located.listID and " +
 //                    "located.addressID = address.addressID and address.country = ?" +
 //                    "group by listing.hostID order by total_list DESC");
-            PreparedStatement s = con.prepareStatement("select owns.hostID, users.firstName, users.lastName, " +
-                    "count(listing.listID) as total_list from Users join owns join listing join located join address" +
+            PreparedStatement s = con.prepareStatement("select users.sin, users.firstName, users.lastName, " +
+                    "count(listing.listID) as total_list from Users join owns join listing join located join address " +
                     "where owns.listID = listing.listID and owns.hostID = users.sin and " +
                     "listing.listID = located.listID and " +
-                    "located.addressID = address.addressID and address.country = ?" +
-                    "group by listing.hostID order by total_list DESC");
+                    "located.addressID = address.addressID and address.country = ? " +
+                    "group by users.sin, firstName, lastName order by total_list DESC");
             s.setString(1, country);
             ResultSet rs = s.executeQuery();
 
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con, user);
-            }
-            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            String format = "%1$-8s| %2$-20s | %3$-20s | %4$-10s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
             String under = "_";
-            for (int i = 0; i < 60; i++) {
+            for (int i = 0; i < 40; i++) {
                 under += "_";
             }
             System.out.println(under);
+            int counter = 0;
             while (rs.next()) {
-                int hostID = rs.getInt("listing.hostID");
+                int hostID = rs.getInt("users.sin");
                 String firstName = rs.getString("users.firstName");
                 String lastName = rs.getString("users.lastName");
                 int count = rs.getInt("total_list");
                 System.out.println(String.format(format, hostID + "", firstName, lastName, count + ""));
+                counter++;
+            }
+            if (counter == 0) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
             }
 
         } catch (Exception e) {
@@ -705,32 +736,28 @@ public class ReportsQueries {
 
     public static void rankListingHostCountryCity() {
         System.out.println("Country");
-        String country = scan.next();
+        String country = scan.nextLine();
 
         System.out.println("City:");
-        String city = scan.next();
+        String city = scan.nextLine();
 
         try {
 //            PreparedStatement s = con.prepareStatement("select listing.hostID, users.firstName, users.lastName, count(listing.listID) as total_list from Users join listing join located join address" +
 //                    "where listing.hostID = users.sin and listing.listID = located.listID and " +
 //                    "located.addressID = address.addressID and address.country = ? and address.city = ?" +
 //                    "group by listing.hostID order by total_list DESC");
-            PreparedStatement s = con.prepareStatement("select owns.hostID, users.firstName, users.lastName, " +
-                    "count(listing.listID) as total_list from Users join owns join listing join located join address" +
+            PreparedStatement s = con.prepareStatement("select sin, users.firstName, users.lastName, " +
+                    "count(listing.listID) as total_list from Users join owns join listing join located join address " +
                     "where owns.listID = listing.listID and owns.hostID = users.sin and " +
                     "listing.listID = located.listID and " +
-                    "located.addressID = address.addressID and address.country = ? and address.city = ?" +
-                    "group by listing.hostID order by total_list DESC");
+                    "located.addressID = address.addressID and address.country = ? and address.city = ? " +
+                    "group by sin, firstName, lastName order by total_list DESC");
             s.setString(1, country);
             s.setString(2, city);
             ResultSet rs = s.executeQuery();
 
             int counter = 0;
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con, user);
-            }
-            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            String format = "%1$-8s| %2$-20s | %3$-20s | %4$-10s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
             String under = "_";
             for (int i = 0; i < 60; i++) {
@@ -738,11 +765,16 @@ public class ReportsQueries {
             }
             System.out.println(under);
             while (rs.next()) {
-                int hostID = rs.getInt("listing.hostID");
+                int hostID = rs.getInt("sin");
                 String firstName = rs.getString("users.firstName");
                 String lastName = rs.getString("users.lastName");
                 int count = rs.getInt("total_list");
                 System.out.println(String.format(format, hostID + "", firstName, lastName, count + ""));
+                counter++;
+            }
+            if (counter == 0) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
             }
 
         } catch (Exception e) {
@@ -798,7 +830,7 @@ public class ReportsQueries {
     public static void plus10percentListingsCountry() {
 
         System.out.println("Country");
-        String country = scan.next();
+        String country = scan.nextLine();
         int totalListings = getTotalListingsCountry(country);
 
         int tenPercList = totalListings / 10;
@@ -819,10 +851,6 @@ public class ReportsQueries {
             ResultSet rs = s.executeQuery();
 
             int counter = 0;
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con, user);
-            }
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
             String under = "_";
@@ -852,9 +880,9 @@ public class ReportsQueries {
 
     public static void plus10percentListingsCityCountry() {
         System.out.println("City:");
-        String city = scan.next();
+        String city = scan.nextLine();
         System.out.println("Country");
-        String country = scan.next();
+        String country = scan.nextLine();
         int totalListings = getTotalListingsCountryCity(country, city);
 
         int tenPercList = totalListings / 10;
@@ -876,10 +904,6 @@ public class ReportsQueries {
             ResultSet rs = s.executeQuery();
 
             int counter = 0;
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con, user);
-            }
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
             String under = "_";
@@ -912,9 +936,9 @@ public class ReportsQueries {
 
     public static void rankRenterBookings() {
         System.out.println("Starting date of reservation:");
-        String startDate = scan.next();
+        String startDate = scan.nextLine();
         System.out.println("Ending date of reservation:");
-        String endDate = scan.next();
+        String endDate = scan.nextLine();
 
         try {
             PreparedStatement s = con.prepareStatement("select reserved.renterID, users.firstName, users.lastName, " +
@@ -924,10 +948,7 @@ public class ReportsQueries {
             s.setString(2, startDate);
             ResultSet rs = s.executeQuery();
 
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con, user);
-            }
+            int counter = 0;
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Renter ID", "First Name", "Last Name", "Count"));
             String under = "_";
@@ -941,6 +962,11 @@ public class ReportsQueries {
                 String lastName = rs.getString("users.lastName");
                 int count = rs.getInt("total_bookings");
                 System.out.println(String.format(format, renterID + "", firstName, lastName, count + ""));
+                counter++;
+            }
+            if (counter == 0) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
             }
 
         } catch (Exception e) {
@@ -955,15 +981,15 @@ public class ReportsQueries {
 
     public static void rankRenterBookingsCity() {
 //        System.out.println("Starting date of reservation:");
-//        String startDate = scan.next();
+//        String startDate = scan.nextLine();
 //        System.out.println("Ending date of reservation:");
-//        String endDate = scan.next();
+//        String endDate = scan.nextLine();
 
         System.out.println("City:");
-        String city = scan.next();
+        String city = scan.nextLine();
 
         System.out.println("Country:");
-        String country = scan.next();
+        String country = scan.nextLine();
 
         try {
             PreparedStatement s = con.prepareStatement("select reserved.renterID, users.firstName, users.lastName, " +
@@ -978,10 +1004,7 @@ public class ReportsQueries {
             s.setString(4, country);
             ResultSet rs = s.executeQuery();
 
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con, user);
-            }
+
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Renter ID", "First Name", "Last Name", "Count"));
             String under = "_";
@@ -997,6 +1020,7 @@ public class ReportsQueries {
                 int count = rs.getInt("total_bookings");
                 if (count >= 2) {
                     System.out.println(String.format(format, renterID + "", firstName, lastName, count + ""));
+                    counter++;
                 }
             }
             if (counter == 0) {
@@ -1021,10 +1045,7 @@ public class ReportsQueries {
             ResultSet rs = s.executeQuery();
 
 
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                mainMenu(con, user);
-            }
+            int counter = 0;
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Total Cancellations"));
             String under = "_";
@@ -1038,6 +1059,11 @@ public class ReportsQueries {
                 String lastName = rs.getString("users.lastName");
                 int count = rs.getInt("total");
                 System.out.println(String.format(format, hostID + "", firstName, lastName, count + ""));
+                counter++;
+            }
+            if (counter == 0) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
             }
 
 
@@ -1059,10 +1085,7 @@ public class ReportsQueries {
             ResultSet rs = s.executeQuery();
 
 
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                mainMenu(con, user);
-            }
+            int counter = 0;
             String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Renter ID", "First Name", "Last Name", "Total Cancellations"));
             String under = "_";
@@ -1076,6 +1099,11 @@ public class ReportsQueries {
                 String lastName = rs.getString("users.lastName");
                 int count = rs.getInt("total");
                 System.out.println(String.format(format, renterID + "", firstName, lastName, count + ""));
+                counter++;
+            }
+            if (counter == 0) {
+                System.out.println("No Entries.\n");
+                ReportsQueries.mainMenu(con, user);
             }
 
 

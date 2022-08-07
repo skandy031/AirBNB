@@ -18,9 +18,9 @@ public class User {
                 System.out.println("Must be an integer. Please try again. \n");
             }
         }
-
+        scan = new Scanner(System.in);
         System.out.println("Enter password:");
-        String password = scan.next();
+        String password = scan.nextLine();
         //check to see if this matches in database
         try {
             PreparedStatement s = con.prepareStatement("select * from users where " +
@@ -31,7 +31,7 @@ public class User {
             if (rs.next()){
                 //entry exists
                 user = username;
-                handleUserMainMenu(username);
+                handleUserMainMenu(username, con);
 
             } else {
                 System.out.println("Username and password do not match.\n");
@@ -42,8 +42,9 @@ public class User {
         }
     }
 
-    public static void handleUserMainMenu(int username){
+    public static void handleUserMainMenu(int username, Connection connection){
         user = username;
+        con = connection;
         int option;
         while (true) {
             System.out.println("Choose an option:");
@@ -65,37 +66,37 @@ public class User {
             scan.close();
             Driver.mainMenu();
         } else if (option == 1) {
-            Renter.handleRenter(user);
+            Renter.handleRenter(user, con);
         } else if (option == 2) {
             Host.handleHost(user, con);
         } else if (option == 3) {
             deleteAccount();
         } else {
             System.out.println("Invalid option.\n");
-            handleUserMainMenu(username);
+            handleUserMainMenu(username, con);
         }
     }
 
 
     public static void createAccount(Connection connection) {
         con = connection;
-        int username = 0, ccNumber = 0, ccMonth = 0, ccYear = 0, cvc = -1;
-        String password = "", firstname="", lastname="", occupation = "", dob = "";
+        int username = 0, ccMonth = 0, ccYear = 0, cvc = -1;
+        String password = "", firstname="", lastname="", occupation = "", dob = "", ccNumber = "";
         try {
             System.out.println("Username (Enter SIN Number):");
             username = scan.nextInt();
             System.out.println("Password:");
-            password = scan.next();
+            password = scan.nextLine();
             System.out.println("First name:");
-            firstname = scan.next();
+            firstname = scan.nextLine();
             System.out.println("Last name:");
-            lastname = scan.next();
+            lastname = scan.nextLine();
             System.out.println("Occupation:");
-            occupation = scan.next();
+            occupation = scan.nextLine();
             System.out.println("Date of birth (YYYY-MM-DD):");
-            dob = scan.next();
+            dob = scan.nextLine();
             System.out.println("Credit Card Number:");
-            ccNumber = scan.nextInt();
+            ccNumber = scan.nextLine();
             System.out.println("Credit Card Expiry Month:");
             ccMonth = scan.nextInt();
             System.out.println("Credit Card Expiry Year:");
@@ -116,7 +117,7 @@ public class User {
             s.setString(6, dob);
             PreparedStatement s2 = con.prepareStatement("insert into Renter values (?,?,?,?,?)");
             s2.setInt(1, username);
-            s2.setInt(2, ccNumber);
+            s2.setString(2, ccNumber);
             s2.setInt(3, ccMonth);
             s2.setInt(4, ccYear);
             s2.setInt(5, cvc);
@@ -157,12 +158,12 @@ public class User {
             } else{
                 System.out.println("Account was not deleted.\n");
                 //send back to handling user work
-                handleUserMainMenu(user);
+                handleUserMainMenu(user, con);
             }
         } catch (SQLException e){
             System.out.println(e);
             //send back to handler
-            handleUserMainMenu(user);
+            handleUserMainMenu(user, con);
         }
         Driver.mainMenu();
     }
