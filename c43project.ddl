@@ -22,14 +22,14 @@ create table Hosts
 create table Renter
 (
     renterID    integer primary key not null references Users (sin),
-    ccNumber    integer             not null,
+    ccNumber    varchar(20)         not null,
     expiryMonth integer             not null,
     expiryYear  integer             not null,
     cvc         integer             not null,
     CHECK ( cvc < 1000 and cvc > 99 ),
     CHECK ( expiryMonth > 0 and expiryMonth <= 12 ),
-    CHECK ( expiryYear > 2022 or (expiryYear = 2022 and expiryMonth > 8)),
-    CHECK ( ccNumber > 999999999999999 and ccNumber <= 9999999999999999 )
+    CHECK ( expiryYear > 2022 or (expiryYear = 2022 and expiryMonth > 8))
+#     CHECK ( ccNumber > 999999999999999 and ccNumber <= 9999999999999999 )
 );
 
 create table Listing
@@ -126,7 +126,7 @@ create table Located
 
 create table Provides
 (
-amenityID integer             not null references Amenities (amenityID),
+    amenityID integer not null references Amenities (amenityID),
     listID    integer not null references Listing (listID)
 #     primary key (listID, amenityID)
 );

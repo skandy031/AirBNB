@@ -192,18 +192,18 @@ public class Renter {
                 int listID = rs.getInt("listID");
                 listingSet.add(listID);
 //                int hostID = rs.getInt("hostID");
-                int price = rs.getInt("price");
+//                int price = rs.getInt("price");
 //                double longitude = rs.getDouble("longitude");
 //                double latitude = rs.getDouble("latitude");
 //                String listingType = rs.getString("listingType");
 
                 //search into listing join located join reserved table for address
-                int streetNo;
+                int streetNo, price;
                 String streetName;
                 String city;
                 int unitNo;
                 PreparedStatement s1 = con.prepareStatement("select address.streetNo, address.streetName, " +
-                        "address.city, address.unitNo from listing join located " +
+                        "address.city, address.unitNo, price from listing join located " +
                         "join address where listing.listID = located.listID and located.addressID = " +
                         "address.addressID and listing.listID = ?");
                 s1.setInt(1, listID);
@@ -213,6 +213,7 @@ public class Renter {
                     streetName = rs1.getString("address.streetName");
                     city = rs1.getString("address.city");
                     unitNo = rs1.getInt("address.unitNo");
+                    price = rs1.getInt("price");
                     System.out.println(String.format(format, listID+"", streetNo+"", streetName,
                             city, unitNo+"", price+""));
                 }
@@ -393,12 +394,14 @@ public class Renter {
 
 
         try {
-            PreparedStatement s = con.prepareStatement("select * from listing where city = ? and country = ? " +
-                    "and listID NOT IN (select Reserved.listID from reserved) UNION" +
-                    "select * from listing where city = ? and country = ? and " +
-                    "NOT IN ( select listID, hostID, listingType, longitude, latitude, price from listing join " +
-                    "reserved where listing.listID = reserved.listID and " +
-                    "(reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false");
+            PreparedStatement s = con.prepareStatement("(select listing.listid from listing join located join " +
+                    "address where listing.listid = located.listid and located.addressid = address.addressid " +
+                    "and city = ? and country = ? and listing.listid not in (select listID from reserved)) union " +
+                    "(select listing.listID from listing join located join address where listing.listid = " +
+                    "located.listid and located.addressid = address.addressid and city = ? and country = ?" +
+                    " and listing.listID not in (select listing.listID from listing join reserved where " +
+                    "reserved.listid = listing.listid and (reserved.startDate <= ? and reserved.endDate >= ?)" +
+                    " and statusAvailable = false));");
             s.setString(1, city);
             s.setString(2, country);
             s.setString(3, city);
