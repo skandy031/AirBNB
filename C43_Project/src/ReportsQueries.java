@@ -1,18 +1,27 @@
+import opennlp.tools.cmdline.parser.ParserTool;
+import opennlp.tools.parser.Parse;
+import opennlp.tools.parser.Parser;
+import opennlp.tools.parser.ParserFactory;
+import opennlp.tools.parser.ParserModel;
+
 import javax.xml.transform.Result;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class ReportsQueries {
 
     static Connection con;
     static Scanner scan = new Scanner(System.in);
 
+//    static String sentence = "Who is the author of The Call of the Wild?";
+
     static int user;
 
+    static Set<Integer> listingID = new HashSet<>();
     public static void mainMenu(Connection connection, int username) {
         con = connection;
         user = username;
@@ -82,7 +91,7 @@ public class ReportsQueries {
             } else if (option == 18) {
                 rankRenterCancel();
             } else if (option == 19) {
-
+                findNounPhrases();
             } else {
                 System.out.println("Invalid option. Please try again.\n");
             }
@@ -97,6 +106,107 @@ public class ReportsQueries {
     //queries
     //by distance
 
+    //recursively loop through tree, extracting noun phrases
+
+    public static HashMap<String,Integer> findNounPhrasesHelper(String sentence, HashMap<String, Integer> count){
+        InputStream modelInParse = null;
+        try {
+            //load chunking model
+            modelInParse = new FileInputStream("en-parser-chunking.bin"); //from http://opennlp.sourceforge.net/models-1.5/
+            ParserModel model = new ParserModel(modelInParse);
+
+            //create parse tree
+            Parser parser = ParserFactory.create(model);
+            Parse topParses[] = ParserTool.parseLine(sentence, parser, 1);
+
+            //call subroutine to extract noun phrases
+            for (Parse p : topParses)
+                getNounPhrases(p,count);
+
+            //print noun phrases
+//            for (String s : nounPhrases)
+//                System.out.println(s);
+
+            //The Call
+            //the Wild?
+            //The Call of the Wild? //punctuation remains on the end of sentence
+            //the author of The Call of the Wild?
+            //the author
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (modelInParse != null) {
+                try {
+                    modelInParse.close();
+                }
+                catch (IOException e) {
+                }
+            }
+        }
+        return count;
+    }
+    public static HashMap<String, Integer> getNounPhrases(Parse p, HashMap<String, Integer> count) {
+
+        if (p.getType().equals("NP")) { //NP=noun phrase
+//            nounPhrases.add(p.getCoveredText());
+            String phrase = p.getCoveredText();
+            if(count.containsKey(phrase)) count.put(phrase,count.get(phrase)+1);
+            else count.put(phrase, 1);
+        }
+        for (Parse child : p.getChildren()) getNounPhrases(child, count);
+        return count;
+    }
+    public static void getAllListings(){
+        String query = "SELECT listID FROM Listing";
+        try{
+            PreparedStatement q = con.prepareStatement(query);
+            ResultSet rs = q.executeQuery();
+            while(rs.next()){
+                listingID.add(rs.getInt(1));
+            }
+        }catch(Exception E){
+            System.out.println(E);
+        }
+    }
+    static Hashtable<Integer, LinkedHashMap<String, Integer>> listRevPairs = new Hashtable<>();
+    public static void findNounPhrases(){
+        getAllListings();
+        for(Integer i: listingID){
+            HashMap<String, Integer> nounPhrases = new HashMap<>();
+            try{
+                String query = "SELECT renterReview FROM Reserved WHERE listID = ? AND hostID != renterID AND statusAvailable = true AND renterReview IS NOT NULL";
+                PreparedStatement q = con.prepareStatement(query);
+                q.setInt(1,i);
+                ResultSet rs = q.executeQuery();
+                while(rs.next()){
+                    String rev = rs.getString(1);
+                    String[] sentences = rev.split(".");
+                    for(String j: sentences){
+                        nounPhrases = findNounPhrasesHelper(j, nounPhrases);
+                    }
+                }
+            }catch(Exception E){
+                System.out.println(E);
+            }
+            LinkedHashMap<String, Integer> sortedMap = new LinkedHashMap<>();
+            ArrayList<Integer> list = new ArrayList<>();
+            for (Map.Entry<String, Integer> entry : nounPhrases.entrySet()) {
+                list.add(entry.getValue());
+            }
+            Collections.sort(list);
+            for (int num : list) {
+                for (Map.Entry<String, Integer> entry : nounPhrases.entrySet()) {
+                    if (entry.getValue().equals(num)) {
+                        sortedMap.put(entry.getKey(), num);
+                    }
+                }
+            }
+            listRevPairs.put(i, sortedMap);
+        }
+        System.out.println(listRevPairs);
+    }
     public static void findListingByCoord() {
         Double lon, lat, distance = 0.0;
 
@@ -121,6 +231,7 @@ public class ReportsQueries {
             query1.setDouble(2, lat);
             query1.setDouble(3, distance);
             ResultSet rs = query1.executeQuery();
+            Host.printListings(rs);
         } catch (Exception E) {
             System.out.println(E);
         }
@@ -785,6 +896,24 @@ public class ReportsQueries {
 
 
     //helper for getting total listings in a country
+    public static void getAdjacentListingsPC(){
+        System.out.println("Enter Postal Code:");
+        String postalCode = scan.nextLine();
+        postalCode.strip();
+        String lastChar = postalCode.substring(postalCode.length() - 1);
+        Integer lstChar = Integer.valueOf(lastChar);
+        String query = "SELECT * FROM Listings join Located using(listID) join Address using(addressID) where postalCode = ? or postalCode = ? or postalCode = ?";
+        try {
+            PreparedStatement query1 = con.prepareStatement(query);
+            query1.setString(1,postalCode);
+            query1.setString(2, postalCode.substring(0,postalCode.length()-1) + (lstChar + 1));
+            query1.setString(2, postalCode.substring(0,postalCode.length()-1) + (lstChar - 1));
+            ResultSet rs = query1.executeQuery();
+            Host.printListings(rs);
+        }catch(Exception E){
+            System.out.println(E);
+        }
+    }
     public static int getTotalListingsCountry(String country) {
         try {
             PreparedStatement s = con.prepareStatement("select * from listing join located join address" +
