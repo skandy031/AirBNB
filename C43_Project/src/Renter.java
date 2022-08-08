@@ -546,10 +546,11 @@ public class Renter {
                     try{
                         //change status on reservation
                         PreparedStatement s = con.prepareStatement("update Reserved set " +
-                                "renterReview = ? where renterScore = ?");
+                                "renterReview = ? , renterScore = ? where reservationID = ?");
                         s.setInt(2, score);
                         s.setString(1, review);
-                        System.out.println(s.executeUpdate());
+                        s.setInt(3,option);
+//                        System.out.println(s.executeUpdate());
                         System.out.println("Successfully updated review.");
                         handleRenter(username, con);
                         return;
