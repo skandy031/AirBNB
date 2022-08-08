@@ -47,7 +47,7 @@ public class User {
         int option;
         while (true) {
             System.out.println("Choose an option:");
-            System.out.println("(0) Exit System");
+            System.out.println("(0) Back Menu");
             System.out.println("(1) Renter");
             System.out.println("(2) Host");
             System.out.println("(3) Delete Account");
