@@ -18,9 +18,9 @@ public class User {
                 System.out.println("Must be an integer. Please try again. \n");
             }
         }
-        scan = new Scanner(System.in);
+
         System.out.println("Enter password:");
-        String password = scan.nextLine();
+        String password = scan.next();
         //check to see if this matches in database
         try {
             PreparedStatement s = con.prepareStatement("select * from users where " +
@@ -42,9 +42,8 @@ public class User {
         }
     }
 
-    public static void handleUserMainMenu(int username, Connection connection){
+    public static void handleUserMainMenu(int username, Connection con){
         user = username;
-        con = connection;
         int option;
         while (true) {
             System.out.println("Choose an option:");
@@ -68,7 +67,7 @@ public class User {
         } else if (option == 1) {
             Renter.handleRenter(user, con);
         } else if (option == 2) {
-            Host.handleHost(user, con);
+            Host.handleHost(user, User.con);
         } else if (option == 3) {
             deleteAccount();
         } else {
@@ -87,17 +86,17 @@ public class User {
             username = scan.nextInt();
             scan = new Scanner(System.in);
             System.out.println("Password:");
-            password = scan.nextLine();
+            password = scan.next();
             System.out.println("First name:");
-            firstname = scan.nextLine();
+            firstname = scan.next();
             System.out.println("Last name:");
-            lastname = scan.nextLine();
+            lastname = scan.next();
             System.out.println("Occupation:");
-            occupation = scan.nextLine();
+            occupation = scan.next();
             System.out.println("Date of birth (YYYY-MM-DD):");
-            dob = scan.nextLine();
+            dob = scan.next();
             System.out.println("Credit Card Number:");
-            ccNumber = scan.nextLine();
+            ccNumber = scan.next();
             System.out.println("Credit Card Expiry Month:");
             ccMonth = scan.nextInt();
             scan = new Scanner(System.in);
