@@ -186,11 +186,11 @@ public class Renter {
 
         try {
 
-            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s | %5$-10s | %6$-15s ";
+            String format = "%1$-20s| %2$-20s | %3$-15s | %4$-15s | %5$-10s | %6$-15s ";
             System.out.println(String.format(format, "Listing ID", "House Number", "Street Name",
                     "City", "Unit Number", "Price"));
             String under = "_";
-            for (int i = 0; i < 90; i++){
+            for (int i = 0; i < 120; i++){
                 under += "_";
             }
             System.out.println(under);
