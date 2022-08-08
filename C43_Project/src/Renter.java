@@ -565,8 +565,8 @@ public class Renter {
 
                     try{
                         //change status on reservation
-                        PreparedStatement s = con.prepareStatement("update Reserved set " +
-                                "renterReview = ? where renterScore = ?");
+                        PreparedStatement s = con.prepareStatement("update Reserved set where" +
+                                "renterReview = ? and renterScore = ?");
                         s.setInt(2, score);
                         s.setString(1, review);
                         System.out.println(s.executeUpdate());

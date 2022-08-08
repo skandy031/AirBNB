@@ -58,7 +58,7 @@ public class ReportsQueries {
             } else if (option == 1) {
                 findListingByCoord();
             } else if (option == 2) {
-
+                getAdjacentListingsPC();
             } else if (option == 3) {
                 searchByAddress();
             } else if (option == 4) {
