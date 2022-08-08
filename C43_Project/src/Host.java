@@ -346,12 +346,12 @@ public class Host {
             status += s1.executeUpdate();
             if (status == 2){
                 System.out.println("Successfully created.");
-                Driver.mainMenu();
+                Driver.mainMenu(con);
             } else{
                 System.out.println("Not able to create account.");
                 System.out.println("(0) Would you like to return to main menu?");
                 if(scan.nextInt() == 0)
-                    Driver.mainMenu();
+                    Driver.mainMenu(con);
                 else
                     createAccount(con);
             }

@@ -26,6 +26,7 @@ public class Renter {
             try {
                 if (scan.hasNext()) {
                     option = scan.nextInt();
+                    scan = new Scanner(System.in);
                     break;
                 }
             } catch (Exception e) {
@@ -155,6 +156,8 @@ public class Renter {
             try {
                 System.out.println("Choose a reservation ID to cancel (-1 to exit):");
                 option = scan.nextInt();
+                scan = new Scanner(System.in);
+
                 if (option == -1){
                     handleRenter(username, con);
                 }
@@ -236,6 +239,8 @@ public class Renter {
 
             try {
                 option = scan.nextInt();
+                scan = new Scanner(System.in);
+
                 if (!listingSet.contains(option)){
                     System.out.println("Option not valid.\n");
                 } else{
@@ -332,6 +337,8 @@ public class Renter {
 
             try {
                 option = scan.nextInt();
+                scan = new Scanner(System.in);
+
                 if (!listingSet.contains(option)){
                     System.out.println("Option not valid.\n");
                 } else{
@@ -407,14 +414,23 @@ public class Renter {
 
 
         try {
-            PreparedStatement s = con.prepareStatement("(select listing.listid from listing join located join " +
-                    "address where listing.listid = located.listid and located.addressid = address.addressid " +
-                    "and city = ? and country = ? and listing.listid not in (select listID from reserved)) union " +
-                    "(select listing.listID from listing join located join address where listing.listid = " +
-                    "located.listid and located.addressid = address.addressid and city = ? and country = ?" +
-                    " and listing.listID not in (select listing.listID from listing join reserved where " +
-                    "reserved.listid = listing.listid and (reserved.startDate <= ? and reserved.endDate >= ?)" +
-                    " and statusAvailable = false));");
+//            PreparedStatement s = con.prepareStatement("(select listing.listid from listing join located join " +
+//                    "address where listing.listid = located.listid and located.addressid = address.addressid " +
+//                    "and city = ? and country = ? and listing.listid not in (select listID from reserved)) union " +
+//                    "(select listing.listID from listing join located join address where listing.listid = " +
+//                    "located.listid and located.addressid = address.addressid and city = ? and country = ?" +
+//                    " and listing.listID not in (select listing.listID from listing join reserved where " +
+//                    "reserved.listid = listing.listid and (reserved.startDate <= ? and reserved.endDate >= ?)" +
+//                    " and statusAvailable = false))");
+            String query = "(select listid from listing join located using (listid) join address using (addressid) join" +
+                    "owns using (listid) where owns.hostid != " + username + " city = '" + city + "' " +
+                    "and country = '" + country + "' and listid not in " +
+                    "(select listid from reserved)) union (select listid from listing join located using (listid) join " +
+                    "address using (addressid) join owns using (listid) where owns.hostid != " + username +
+                    " city = '" + city + "' and country = '" + country + "' and listid not in " +
+                    "(select listid from listing join reserved using (listid) where (reserved.startDate <= ? " +
+                    "and reserved.endDate >= ?) and statusAvailable = false))";
+            PreparedStatement s = con.prepareStatement(query);
             s.setString(1, city);
             s.setString(2, country);
             s.setString(3, city);
@@ -435,6 +451,7 @@ public class Renter {
 
                 try {
                     option = scan.nextInt();
+                    scan = new Scanner(System.in);
                     if (option == 0){
                         handleRenter(username, con);
                         break;
@@ -524,6 +541,8 @@ public class Renter {
             try {
                 System.out.println("Choose a reservation ID to review (-1 to exit):");
                 option = scan.nextInt();
+                scan = new Scanner(System.in);
+
                 if (option == -1){
                     handleRenter(username, con);
                 }
@@ -533,6 +552,7 @@ public class Renter {
                         System.out.println("Rate your stay from 1-5:");
                         try {
                             score = scan.nextInt();
+                            scan = new Scanner(System.in);
                             break;
                         } catch (Exception e){
                             System.out.println("Must be an integer.");

@@ -6,8 +6,8 @@ public class Driver {
     static Connection con = null;
     static Scanner scan = new Scanner(System.in);
 
-    public static void mainMenu() {
-
+    public static void mainMenu(Connection connection) {
+        con = connection;
         //take in user input
         int option = -1;
         while (true) {
@@ -19,15 +19,15 @@ public class Driver {
             Scanner scan = new Scanner(System.in);
             try {
                 option = scan.nextInt();
+                scan = new Scanner(System.in);
                 break;
             } catch (Exception e) {
                 System.out.println("Invalid option. Must be an integer.\n");
-                scan.nextLine();
             }
         }
         try {
             if (option == 0) {
-                return;
+                System.exit(0);
             } else if (option == 1) {
                 User.handleLogin(con);
             } else if (option == 2) {
@@ -36,7 +36,7 @@ public class Driver {
                 ReportsQueries.mainMenu(con,-1);
             } else {
                 System.out.println("Invalid option.\n");
-                mainMenu();
+                mainMenu(con);
             }
         } catch (Exception e){
             System.out.println(e);
@@ -50,9 +50,10 @@ public class Driver {
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/final_project",
                     "root", "Parekh80");
 
-            if (!con.isClosed())
+            if (!con.isClosed()){
                 System.out.println("Successfully connected to MySQL server using TCP/IP...");
-            mainMenu();
+                mainMenu(con);
+            }
 
         } catch (Exception e) {
             System.err.println("Exception: " + e.getMessage());
