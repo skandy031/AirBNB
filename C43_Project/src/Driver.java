@@ -47,7 +47,6 @@ public class Driver {
                 ReportsQueries.mainMenu(con,2);
             } else {
                 System.out.println("Invalid option.\n");
-                mainMenu();
             }
         } catch (Exception e){
             System.out.println(e);
