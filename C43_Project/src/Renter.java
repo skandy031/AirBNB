@@ -540,16 +540,16 @@ public class Renter {
                     }
 
                     System.out.println("Leave a review:");
-                    String review = scan.next();
+                    String review = scan.nextLine();
 
 
                     try{
                         //change status on reservation
-                        PreparedStatement s = con.prepareStatement("update reserved set " +
+                        PreparedStatement s = con.prepareStatement("update Reserved set " +
                                 "renterReview = ? where renterScore = ?");
                         s.setInt(2, score);
                         s.setString(1, review);
-                        s.executeUpdate();
+                        System.out.println(s.executeUpdate());
                         System.out.println("Successfully updated review.");
                         handleRenter(username, con);
                         return;

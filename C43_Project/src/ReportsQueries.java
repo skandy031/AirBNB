@@ -173,19 +173,24 @@ public class ReportsQueries {
     static Hashtable<Integer, LinkedHashMap<String, Integer>> listRevPairs = new Hashtable<>();
     public static void findNounPhrases(){
         getAllListings();
+//        System.out.println(listingID);
         for(Integer i: listingID){
+//            System.out.println(i);
             HashMap<String, Integer> nounPhrases = new HashMap<>();
             try{
-                String query = "SELECT renterReview FROM Reserved WHERE listID = ? AND hostID != renterID AND statusAvailable = true AND renterReview IS NOT NULL";
+                String query = "SELECT renterReview FROM Reserved WHERE listID = ? AND hostID != renterID AND statusAvailable = false AND renterReview IS NOT NULL";
                 PreparedStatement q = con.prepareStatement(query);
                 q.setInt(1,i);
                 ResultSet rs = q.executeQuery();
                 while(rs.next()){
                     String rev = rs.getString(1);
-                    String[] sentences = rev.split(".");
-                    for(String j: sentences){
-                        nounPhrases = findNounPhrasesHelper(j, nounPhrases);
-                    }
+//                    System.out.println(rev);
+//                    String[] sentences = rev.split(".");
+//                    System.out.println(sentences);
+//                    for(String j: sentences){
+//                        System.out.println(rev);
+                        nounPhrases = findNounPhrasesHelper(rev, nounPhrases);
+//                    }
                 }
             }catch(Exception E){
                 System.out.println(E);
@@ -205,7 +210,20 @@ public class ReportsQueries {
             }
             listRevPairs.put(i, sortedMap);
         }
-        System.out.println(listRevPairs);
+        printList();
+        listRevPairs = null;
+    }
+    public static void printList(){
+        for(Integer i: listRevPairs.keySet()){
+            System.out.println("Listing ID: " + i);
+            HashMap<String, Integer> values = listRevPairs.get(i);
+            if(values.isEmpty()) System.out.println("No Reviews\n-------------------------------------------------");
+            Integer count = 1;
+            for(String j: values.keySet()){
+                System.out.println("    "+count + ". "+j);
+                count +=1;
+            }
+        }
     }
     public static void findListingByCoord() {
         Double lon, lat, distance = 0.0;
