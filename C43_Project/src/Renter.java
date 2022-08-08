@@ -565,17 +565,22 @@ public class Renter {
 
                     try{
                         //change status on reservation
-                        PreparedStatement s = con.prepareStatement("update Reserved set where" +
-                                "renterReview = ? and renterScore = ?");
-                        s.setInt(2, score);
+                        PreparedStatement s = con.prepareStatement("update Reserved set " +
+                                "renterReview = ?, renterScore = ? where reservationID = ?");
                         s.setString(1, review);
-                        System.out.println(s.executeUpdate());
-                        System.out.println("Successfully updated review.");
-                        handleRenter(username, con);
-                        return;
+                        s.setInt(2, score);
+                        s.setInt(3, option);
+                        int status = s.executeUpdate();
+                        if (status == 1){
+                            System.out.println("Successfully updated review.");
+                        } else {
+                            System.out.println("Unable to complete review.");
+                        }
                     } catch (SQLException e){
                         System.out.println(e);
+                        System.out.println("Unable to complete review.");
                     }
+                    handleRenter(username, con);
                 }
             } catch (Exception e) {
                 System.out.println("Invalid.\n");
