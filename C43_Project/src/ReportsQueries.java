@@ -28,7 +28,7 @@ public class ReportsQueries {
 
         //display all options
         System.out.println("\nChoose an option:\n" +
-                "(0) Exit\n" +
+                "(0) Back Menu\n" +
                 "(1) Search by Distance\n" +
                 "(2) Search by Postal Code\n" +
                 "(3) Search by Address\n" +
@@ -625,9 +625,9 @@ public class ReportsQueries {
 
     // num of bookings in date range by city, country
     public static void numBookingsCity() {
-        System.out.println("Starting date of reservation:");
+        System.out.println("Starting date:");
         String startDate = scan.nextLine();
-        System.out.println("Ending date of reservation:");
+        System.out.println("Ending date:");
         String endDate = scan.nextLine();
 
 
@@ -674,9 +674,9 @@ public class ReportsQueries {
 
     //num of bookings in date range by city, country, postal code
     public static void numBookingsCityPostal() {
-        System.out.println("Starting date of reservation:");
+        System.out.println("Starting date:");
         String startDate = scan.nextLine();
-        System.out.println("Ending date of reservation:");
+        System.out.println("Ending date:");
         String endDate = scan.nextLine();
 
 
@@ -1083,9 +1083,9 @@ public class ReportsQueries {
     //rank renters by number of bookings in a specific time period
 
     public static void rankRenterBookings() {
-        System.out.println("Starting date of reservation:");
+        System.out.println("Starting date:");
         String startDate = scan.nextLine();
-        System.out.println("Ending date of reservation:");
+        System.out.println("Ending date:");
         String endDate = scan.nextLine();
 
         try {
@@ -1201,7 +1201,7 @@ public class ReportsQueries {
 
 
             int counter = 0;
-            String format = "%1$-15s| %2$-15s | %3$-15s | %4$-125s";
+            String format = "%1$-15s| %2$-15s | %3$-15s | %4$-25s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Total Cancellations"));
             String under = "_";
             for (int i = 0; i < 80; i++) {
@@ -1209,9 +1209,9 @@ public class ReportsQueries {
             }
             System.out.println(under);
             while (rs.next()) {
-                int hostID = rs.getInt("reserved.hostID");
-                String firstName = rs.getString("users.firstName");
-                String lastName = rs.getString("users.lastName");
+                int hostID = rs.getInt("hostID");
+                String firstName = rs.getString("firstName");
+                String lastName = rs.getString("lastName");
                 int count = rs.getInt("total");
                 System.out.println(String.format(format, hostID + "", firstName, lastName, count + ""));
                 counter++;
@@ -1242,17 +1242,17 @@ public class ReportsQueries {
 
 
             int counter = 0;
-            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            String format = "%1$-15s| %2$-15s | %3$-15s | %4$-20s";
             System.out.println(String.format(format, "Renter ID", "First Name", "Last Name", "Total Cancellations"));
             String under = "_";
-            for (int i = 0; i < 60; i++) {
+            for (int i = 0; i < 70; i++) {
                 under += "_";
             }
             System.out.println(under);
             while (rs.next()) {
-                int renterID = rs.getInt("reserved.renterID");
-                String firstName = rs.getString("users.firstName");
-                String lastName = rs.getString("users.lastName");
+                int renterID = rs.getInt("renterID");
+                String firstName = rs.getString("firstName");
+                String lastName = rs.getString("lastName");
                 int count = rs.getInt("total");
                 System.out.println(String.format(format, renterID + "", firstName, lastName, count + ""));
                 counter++;

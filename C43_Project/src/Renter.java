@@ -17,7 +17,7 @@ public class Renter {
         int option;
         while (true) {
             System.out.println("\nChoose an option:");
-            System.out.println("(0) Exit System");
+            System.out.println("(0) Back Menu");
             System.out.println("(1) Create Reservation");
             System.out.println("(2) View Reservations");
             System.out.println("(3) Cancel Reservation");
@@ -399,10 +399,17 @@ public class Renter {
         System.out.println("Ending date of reservation:");
         String endDate = scan.next();
 
-//        try {
-//            PreparedStatement s = con.prepareStatement("select * from users where curdate() <= ?");
-//            s.setString(startDate);
-//        }
+        try {
+            PreparedStatement s_date = con.prepareStatement("select * from users where curdate() <= ?");
+            s_date.setString(1, startDate);
+            ResultSet rs_date = s_date.executeQuery();
+            if (!rs_date.next()){
+                System.out.println("Start date cannot be in past. Please try again.");
+                createReservation(username);
+            }
+        } catch (Exception e){
+            System.out.println("Error. Please try again.");
+        }
 
         //choose city
         System.out.println("City:");
