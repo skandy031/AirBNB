@@ -400,6 +400,11 @@ public class Renter {
         System.out.println("Ending date of reservation:");
         String endDate = scan.next();
 
+//        try {
+//            PreparedStatement s = con.prepareStatement("select * from users where curdate() <= ?");
+//            s.setString(startDate);
+//        }
+
         //choose city
         System.out.println("City:");
         String city = scan.next();
