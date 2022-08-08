@@ -54,7 +54,6 @@ public class Renter {
         }
     }
 
-
     public static HashSet<Integer> printResTable(int username){
         HashSet<Integer> reserveSet = new HashSet<>();
         try {
