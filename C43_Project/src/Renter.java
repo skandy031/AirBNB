@@ -414,29 +414,22 @@ public class Renter {
 
 
         try {
-//            PreparedStatement s = con.prepareStatement("(select listing.listid from listing join located join " +
-//                    "address where listing.listid = located.listid and located.addressid = address.addressid " +
-//                    "and city = ? and country = ? and listing.listid not in (select listID from reserved)) union " +
-//                    "(select listing.listID from listing join located join address where listing.listid = " +
-//                    "located.listid and located.addressid = address.addressid and city = ? and country = ?" +
-//                    " and listing.listID not in (select listing.listID from listing join reserved where " +
-//                    "reserved.listid = listing.listid and (reserved.startDate <= ? and reserved.endDate >= ?)" +
-//                    " and statusAvailable = false))");
-            String query = "(select listid from listing join located using (listid) join address using (addressid) join" +
-                "owns using (listid) where owns.hostid != " + username + " city = '" + city + "' " +
+            String query = "(select listid from listing join located using (listid) join address using (addressid) join " +
+                "owns using (listid) where owns.hostid != " + username + " and city = '" + city + "' " +
                 "and country = '" + country + "' and listid not in " +
                 "(select listid from reserved)) union (select listid from listing join located using (listid) join " +
                 "address using (addressid) join owns using (listid) where owns.hostid != " + username +
-                " city = '" + city + "' and country = '" + country + "' and listid not in " +
+                " and city = '" + city + "' and country = '" + country + "' and listid not in " +
                 "(select listid from listing join reserved using (listid) where (reserved.startDate <= ? " +
                 "and reserved.endDate >= ?) and statusAvailable = false))";
             PreparedStatement s = con.prepareStatement(query);
-            s.setString(1, city);
-            s.setString(2, country);
-            s.setString(3, city);
-            s.setString(4, country);
-            s.setString(5, endDate);
-            s.setString(6, startDate);
+
+//            s.setString(1, city);
+//            s.setString(2, country);
+//            s.setString(3, city);
+//            s.setString(4, country);
+            s.setString(1, endDate);
+            s.setString(2, startDate);
             ResultSet rs = s.executeQuery();
             HashSet<Integer> listingSet = printListingOptions(rs);
 
