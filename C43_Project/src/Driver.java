@@ -45,10 +45,10 @@ public class Driver {
 
     public static void main(String[] args) {
         try {
-//            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/AirBNB",
-//                    "root", "Skandium86");
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/final_project",
-                    "root", "Parekh80");
+                    "root", "Skandium86");
+//            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/final_project",
+//                    "root", "Parekh80");
 
             if (!con.isClosed()){
                 System.out.println("Successfully connected to MySQL server using TCP/IP...");
