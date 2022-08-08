@@ -234,15 +234,14 @@ public class ReportsQueries {
             lon = scan.nextDouble();
             System.out.println("Longitude:");
             lat = scan.nextDouble();
-            if (lon >= -85 || lon <= 85 || lat >= -180 || lat <= 180) break;
-            else System.out.println("Values out of range for longitude or latitude");
+            if (!(lon >= -85 || lon <= 85 || lat >= -180 || lat <= 180)) System.out.println("Values out of range for longitude or latitude");
             System.out.println("Distance (km):");
             distance = scan.nextDouble();
             if (distance > 1) break;
             else System.out.println("Distance can't be negative");
         }
         String query = "SELECT * \n" +
-                "FROM Listing \n" +
+                "FROM Listing join Located using(listID) join Address using(addressID)\n" +
                 "WHERE ST_Distance_Sphere(point(?,?), point(longitude,latitude))/1000 <= ?";
         try {
             PreparedStatement query1 = con.prepareStatement(query);

@@ -84,9 +84,10 @@ public class User {
         try {
             System.out.println("Username (Enter SIN Number):");
             username = scan.nextInt();
-            scan = new Scanner(System.in);
+//            scan = new Scanner(System.in);
             System.out.println("Password:");
             password = scan.next();
+            scan.nextLine();
             System.out.println("First name:");
             firstname = scan.nextLine();
             System.out.println("Last name:");
@@ -114,9 +115,10 @@ public class User {
             PreparedStatement s = con.prepareStatement("insert into Users values (?,?,?,?,?,?)");
             s.setInt(1, username);
             s.setString(2, password);
-            s.setString(3, firstname);
-            s.setString(4, lastname);
-            s.setString(5, occupation);
+            s.setString(3, occupation);
+            s.setString(4, firstname);
+            s.setString(5, lastname);
+
             s.setString(6, dob);
             PreparedStatement s2 = con.prepareStatement("insert into Renter values (?,?,?,?,?)");
             s2.setInt(1, username);

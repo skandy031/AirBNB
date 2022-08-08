@@ -132,3 +132,6 @@ create table Provides
 #     primary key (listID, amenityID)
 );
 
+INSERT INTO Users VALUES (1,'1','Lawyer','user1','user1Last','1933-02-01'),(2,'2','Accountant','user2','user2Last','1900-02-03'),(5,'5','Construction Worker','user5','user5Last','1984-03-01'),(987654321,'CSCC43','Janitor','Pouis','Pitt','2001-12-12');
+INSERT INTO Hosts VALUES (1),(2),(5),(987654321);
+INSERT INTO Renter VALUES (1,'1234567890123456',2,2023,454),(2,'098765432109876',2,2023,123),(5,'3417666511740392',5,2024,896),(987654321,'654321789018462',8,2031,648);

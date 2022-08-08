@@ -62,6 +62,7 @@ public class Host {
                 price = scan.nextDouble();
                 System.out.println("Street Number:");
                 sNo = scan.nextInt();
+                scan.nextLine();
                 System.out.println("Street Name:");
                 sName = scan.nextLine();
                 System.out.println("City:");
@@ -88,6 +89,8 @@ public class Host {
                     "    SELECT 'washer', washer FROM " + subQuery + " tbl2\n" +
                     "    UNION ALL\n" +
                     "    SELECT 'ac', ac FROM " + subQuery + " tbl3\n" +
+                    "    UNION ALL\n" +
+                    "    SELECT 'heating', heating FROM " + subQuery + " tbl24\n" +
                     "    UNION ALL\n" +
                     "    SELECT 'tv', tv FROM " + subQuery + " tbl4\n" +
                     "        UNION ALL\n" +
@@ -283,12 +286,15 @@ public class Host {
             query1.executeUpdate();
             query = "DELETE Listing, Located, Amenities, Address, Provides FROM " +
                 "Listing join Located USING (listID) join " +
-                "Address using (addressID) join Amenities using (amenityID))\n" +
+                "Address using (addressID) join Provides using(listID) join Amenities using (amenityID) \n" +
                 "WHERE listID = ?";
             query1 = con.prepareStatement(query);
             query1.setInt(1, listId);
-
-            if (5 == query1.executeUpdate()) System.out.println("Deleted Listing " + listId);
+            Integer status = query1.executeUpdate();
+            query = "DELETE FROM Reserved WHERE listID = ?";
+            query1.setInt(1,listId);
+            status += query1.executeUpdate();
+            if (5 <= query1.executeUpdate()) System.out.println("Deleted Listing " + listId);
             else System.out.println("Unsuccessful");
         } catch (Exception e) {
             System.out.println("Error: " + e);
@@ -298,7 +304,7 @@ public class Host {
 
     public static int printListings(ResultSet rs) {
         Integer i = 0;
-        String fmt = "|%-9s|%-13s|%-8s|%-8s|%-20s|%-20s|%-20s|%-20s|%-20s|%-7s|";
+        String fmt = "|%-9s|%-20s|%-10s|%-10s|%-25s|%-20s|%-20s|%-20s|%-20s|%-10s|";
         Integer check = 0;
         try {
             while (rs.next()) {
@@ -315,7 +321,7 @@ public class Host {
                 String country = rs.getString("country");
                 String pc = rs.getString("postalCode");
                 Double price = rs.getDouble("price");
-                System.out.println(String.format(fmt, listId, longitude, latitude, type, sNo + " " + sName, city, province, country, pc, price));
+                System.out.println(String.format(fmt,  listId, type,longitude, latitude, sNo + " " + sName, city, province, country, pc, price));
                 i += 1;
             }
         } catch (Exception E) {
@@ -432,7 +438,7 @@ public class Host {
             String query = "SET SQL_SAFE_UPDATES = 0";
             PreparedStatement query1 = con.prepareStatement(query);
             query1.executeUpdate();
-            query = "UPDATE Listings SET price = ? WHERE listID = ?";
+            query = "UPDATE Listing SET price = ? WHERE listID = ? and listID NOT IN (SELECT listID FROM Reserved WHERE listID = ? AND CURDATE() > endDate)";
             PreparedStatement q = con.prepareStatement(query);
             q.setDouble(1, price);
             q.setInt(2, listID);
@@ -441,7 +447,7 @@ public class Host {
             } else {
                 System.out.println("Update unsuccessful");
             }
-            handleHost(user, con);
+//            handleHost(user, con);
 
         } catch (Exception e) {
             System.out.println(e);
@@ -576,11 +582,12 @@ public class Host {
                 else if (opt == 6) updatePrice();
                 else if (opt == 7) cancelBooking();
                 else if (opt == 8) leaveReview();
-                else if (opt == 0) return;
+                else if (opt == 0) break;
                 else System.out.println("Invalid Option. Try again.");
             } catch (Exception e) {
                 System.out.println(e);
             }
         }
+        User.handleUserMainMenu(user,con);
     }
 }
