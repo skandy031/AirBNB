@@ -54,6 +54,7 @@ public class User {
             try {
                 if (scan.hasNext()) {
                     option = scan.nextInt();
+                    scan = new Scanner(System.in);
                     break;
                 }
             } catch (Exception e) {
@@ -62,8 +63,7 @@ public class User {
         }
 
         if (option == 0) {
-            scan.close();
-            Driver.mainMenu();
+            Driver.mainMenu(con);
         } else if (option == 1) {
             Renter.handleRenter(user, con);
         } else if (option == 2) {
@@ -84,6 +84,7 @@ public class User {
         try {
             System.out.println("Username (Enter SIN Number):");
             username = scan.nextInt();
+            scan = new Scanner(System.in);
             System.out.println("Password:");
             password = scan.next();
             System.out.println("First name:");
@@ -98,10 +99,13 @@ public class User {
             ccNumber = scan.next();
             System.out.println("Credit Card Expiry Month:");
             ccMonth = scan.nextInt();
+            scan = new Scanner(System.in);
             System.out.println("Credit Card Expiry Year:");
             ccYear = scan.nextInt();
+            scan = new Scanner(System.in);
             System.out.println("Credit Card CVC:");
             cvc = scan.nextInt();
+            scan = new Scanner(System.in);
         } catch (Exception e){
             System.out.println(e);
             createAccount(con);
@@ -140,7 +144,7 @@ public class User {
         }
 
         // send this back to the main menu
-        Driver.mainMenu();
+        Driver.mainMenu(con);
     }
 
     public static void deleteAccount(){
@@ -153,7 +157,7 @@ public class User {
             int status3 = s3.executeUpdate();
             if ((status1 == 1) && (status2 == 1) && (status3 == 1)) {
                 System.out.println("Successfully deleted.\n");
-                Driver.mainMenu();
+                Driver.mainMenu(con);
             } else{
                 System.out.println("Account was not deleted.\n");
                 //send back to handling user work
@@ -164,7 +168,7 @@ public class User {
             //send back to handler
             handleUserMainMenu(user, con);
         }
-        Driver.mainMenu();
+        Driver.mainMenu(con);
     }
 
 }

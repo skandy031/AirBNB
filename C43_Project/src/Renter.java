@@ -538,25 +538,20 @@ public class Renter {
                             System.out.println("Must be an integer.");
                         }
                     }
-                    scan = new Scanner(System.in);
+
                     System.out.println("Leave a review:");
                     String review = scan.nextLine();
 
 
                     try{
                         //change status on reservation
-                        String query;
-                        query = "SET SQL_SAFE_UPDATES = 0";
-                        PreparedStatement query1 = con.prepareStatement(query);
-                        query1.executeUpdate();
                         PreparedStatement s = con.prepareStatement("update Reserved set " +
-                                "renterReview = ? , renterScore = ? WHERE reservationID = ?");
+                                "renterReview = ? where renterScore = ?");
                         s.setInt(2, score);
                         s.setString(1, review);
-                        s.setInt(3, option);
                         System.out.println(s.executeUpdate());
                         System.out.println("Successfully updated review.");
-//                        handleRenter(username, con);
+                        handleRenter(username, con);
                         return;
                     } catch (SQLException e){
                         System.out.println(e);

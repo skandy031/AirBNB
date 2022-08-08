@@ -52,12 +52,13 @@ public class ReportsQueries {
         int option;
         try {
             option = scan.nextInt();
+            scan = new Scanner(System.in);
             if (option == 0) {
-                User.handleUserMainMenu(username, con);
+                Driver.mainMenu(con);
             } else if (option == 1) {
                 findListingByCoord();
             } else if (option == 2) {
-
+                getAdjacentListingsPC();
             } else if (option == 3) {
                 searchByAddress();
             } else if (option == 4) {
@@ -267,13 +268,12 @@ public class ReportsQueries {
         while (true) {
             try {
                 houseNumber = scan.nextInt();
+                scan = new Scanner(System.in);
                 break;
             } catch (Exception e) {
                 System.out.println("Invalid. Must be integer.");
             }
         }
-//        scan = null;
-        scan = new Scanner(System.in);
         System.out.println("Street Name:");
         String streetName = scan.nextLine();
         System.out.println("City:");
@@ -291,6 +291,7 @@ public class ReportsQueries {
         while (true) {
             try {
                 unitNumber = scan.nextInt();
+                scan = new Scanner(System.in);
                 break;
             } catch (Exception e) {
                 System.out.println("Invalid. Must be integer.");
@@ -391,18 +392,18 @@ public class ReportsQueries {
 
     // filter searches
     private static void printListingOptions(ResultSet rs){
-//        HashSet<Integer> listingSet = new HashSet<>();
-
         try {
 
-            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s | %5$-10s | %6$-15s ";
+            String format = "%1$-20s| %2$-15s | %3$-15s | %4$-15s | %5$-15s | %6$-15s ";
             System.out.println(String.format(format, "Listing ID", "House Number", "Street Name",
                     "City", "Unit Number", "Price"));
             String under = "_";
-            for (int i = 0; i < 90; i++){
+            for (int i = 0; i < 100; i++){
                 under += "_";
             }
             System.out.println(under);
+
+            int counter = 0;
 
             while (rs.next()){
                 int listID = rs.getInt("listID");
@@ -424,7 +425,7 @@ public class ReportsQueries {
                         "address.addressID and listing.listID = ?");
                 s1.setInt(1, listID);
                 ResultSet rs1 = s1.executeQuery();
-                if (rs.next()){
+                if (rs1.next()){
                     streetNo = rs1.getInt("address.streetNo");
                     streetName = rs1.getString("address.streetName");
                     city = rs1.getString("address.city");
@@ -433,6 +434,10 @@ public class ReportsQueries {
                     System.out.println(String.format(format, listID+"", streetNo+"", streetName,
                             city, unitNo+"", price+""));
                 }
+                counter++;
+            }
+            if (counter == 0){
+                System.out.println("No entries.\n");
             }
         } catch (Exception e){
             System.out.println("Unable to complete. Please try again.");
@@ -442,48 +447,52 @@ public class ReportsQueries {
 
     public static void filteredSearch() {
 
-        String query = "select listing.listid from listing join located join address join provides join amenities " +
-                "join reserved where listing.listid = reserved.listid and " +
-                "listing.listid = located.listid and address.addressid = located.addressid and listing.listid = " +
-                "provides.listid and provides.amenityID = amenities.amenityID";
+//        String query = "select listing.listid from listing join located join address join provides join amenities " +
+//                "join reserved where listing.listid = reserved.listid and " +
+//                "listing.listid = located.listid and address.addressid = located.addressid and listing.listid = " +
+//                "provides.listid and provides.amenityID = amenities.amenityID";
+        String query = "select listid from listing join located using (listid) " +
+                "join address using (addressid) " +
+                "join provides using (listid) join amenities using (amenityID) where true=true";
 
         //search by country, city, postal code
         System.out.println("Search by country (y/n):");
         String option = scan.nextLine();
-        if (option.toLowerCase() == "y") {
+        if (option.toLowerCase().equals("y")) {
             System.out.println("Country:");
             String country = scan.nextLine();
             query += " and address.country = '" + country + "'";
 
             System.out.println("Add city to search (y/n):");
             option = scan.nextLine();
-            if (option.toLowerCase() == "y") {
-                System.out.println("Country:");
+            if (option.toLowerCase().equals("y")) {
+                System.out.println("City:");
                 String city = scan.nextLine();
                 query += " and address.city = '" + city + "'";
 
                 System.out.println("Add postal code to search (y/n):");
                 option = scan.nextLine();
-                if (option.toLowerCase() == "y") {
+                if (option.toLowerCase().equals("y")) {
                     System.out.println("Postal Code:");
                     String postal = scan.nextLine();
                     query += " and address.postalCode = '" + postal + "'";
 
                     System.out.println("Add street name to search (y/n):");
                     option = scan.nextLine();
-                    if (option.toLowerCase() == "y"){
+                    if (option.toLowerCase().equals("y")){
                         System.out.println("Street Name:");
                         String streetName = scan.nextLine();
                         query += " and address.streetName = '" + streetName + "'";
 
                         System.out.println("Add house number to search (y/n):");
                         option = scan.nextLine();
-                        if (option.toLowerCase() == "y"){
+                        if (option.toLowerCase().equals("y")){
                             int houseNum;
                             while (true){
                                 try {
                                     System.out.println("House Number:");
                                     houseNum = scan.nextInt();
+                                    scan = new Scanner(System.in);
                                     break;
                                 } catch (Exception e){
                                     System.out.println("Must be an integer. Try again.");
@@ -502,15 +511,18 @@ public class ReportsQueries {
         //search by price
         System.out.println("Add price range to search (y/n):");
         option = scan.nextLine();
-        if (option == "y") {
+        if (option.toLowerCase().equals("y")) {
             while (true) {
-                int lower, upper;
+                double lower, upper;
                 try {
                     System.out.println("Lower bound of price:");
-                    lower = scan.nextInt();
+                    lower = scan.nextDouble();
+                    scan = new Scanner(System.in);
                     System.out.println("Upper bound of price:");
-                    upper = scan.nextInt();
-                    query += " and listing.price > " + lower + " and listing.price < " + upper;
+                    upper = scan.nextDouble();
+                    scan = new Scanner(System.in);
+                    query += " and price >= " + lower + " and price <= " + upper;
+                    break;
 
                 } catch (Exception e) {
                     System.out.println("Must be integer. ");
@@ -521,7 +533,7 @@ public class ReportsQueries {
         //search by listing type
         System.out.println("Search by listing type (y/n):");
         option = scan.nextLine();
-        if (option == "y") {
+        if (option.toLowerCase().equals("y")) {
             System.out.println("Listing Type:");
             String listType = scan.nextLine();
             query += " and listing.listingType = '" + listType + "'";
@@ -529,9 +541,9 @@ public class ReportsQueries {
 
 
         //search by amenities
-        System.out.println("Search by amenities:");
+        System.out.println("Search by amenities (y/n):");
         option = scan.nextLine();
-        if (option.toLowerCase() == "y"){
+        if (option.toLowerCase().equals("y")){
             ArrayList<Integer> choices = new ArrayList<>();
             ArrayList<String> names = new ArrayList<>(List.of("wifi", "washer", "ac", "heating", "tv", "iron", "kitchen",
                     "dryer", "workspace", "hairDryer", "pool", "parking", "crib", "grill", "indoorFireplace", "hotTub", "evCharger",
@@ -549,6 +561,7 @@ public class ReportsQueries {
             while (bre == 0) {
                 System.out.println("Amenities Chosen: " + choices);
                 Integer option_amen = scan.nextInt();
+                scan = new Scanner(System.in);
                 if (option_amen == 0) {
                     bre = 1;
                 } else {
@@ -563,7 +576,7 @@ public class ReportsQueries {
             for (int i = 0; i < 24; i ++){
                 if (choices.contains(i))
                     query += " and " + names.get(i) + "= true";
-                else query += " and " + names.get(i) + "= false";
+//                else query += " and " + names.get(i) + "= false";
             }
         }
 
@@ -572,18 +585,21 @@ public class ReportsQueries {
         //search by time frame
         System.out.println("Add time frame availability to search (y/n):");
         option = scan.nextLine();
-        if (option.toLowerCase() == "y"){
-            query = "(" + query + ")";
+        if (option.toLowerCase().equals("y")){
             System.out.println("Starting date:");
             String startDate = scan.nextLine();
             System.out.println("Ending date:");
             String endDate = scan.nextLine();
-            query += " intersects ((select listing.listid from listing where listid not in " +
-                    "(select listid from reserved)) union (select listing.listID from listing " +
-                    "join reserved where listing.listid = reserved.listid and listing.listid not in " +
-                    "(select listing.listID from listing join reserved where reserved.listid = listing.listid " +
-                    "and (reserved.startDate <= '" + endDate + "' and reserved.endDate >= '" + startDate + "' " +
-                    ") and statusAvailable = false)))";
+//            query += " intersects ((select listing.listid from listing where listid not in " +
+//                    "(select listid from reserved)) union (select listing.listID from listing " +
+//                    "join reserved where listing.listid = reserved.listid and listing.listid not in " +
+//                    "(select listing.listID from listing join reserved where reserved.listid = listing.listid " +
+//                    "and (reserved.startDate <= '" + endDate + "' and reserved.endDate >= '" + startDate + "' " +
+//                    ") and statusAvailable = false)))";
+            query += " and listid in (Select listid from listing where listid not in (select listid from reserved) " +
+                    "union (select listid from listing where listid not in (select listID from listing " +
+                    "join reserved using (listid) where startDate <= '" + endDate + "'and endDate >= '" +
+                    startDate + "' and statusAvailable = false)))";
         }
 
         //all filters are completed
@@ -617,15 +633,17 @@ public class ReportsQueries {
 
 
         try {
-            PreparedStatement s = con.prepareStatement("select city, country" +
-                    "count(reserved.listid) as total from reserved join located join address where " +
-                    "reserved.listid = located.listid and located.addressid = address.addressid and" +
-                    "(reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false " +
-                    "group by city, country");
+            String query = "select city, country, count(reserved.listid) as total from " +
+                    "reserved join located using (listid) join address using (addressid) " +
+                    "where startDate <= ? and endDate >= ? and statusAvailable = false " +
+                    "group by city, country";
+
+            PreparedStatement s = con.prepareStatement(query);
 
             s.setString(1, endDate);
             s.setString(2, startDate);
             ResultSet rs = s.executeQuery();
+
 
             //print out all the listings
             int counter = 0;
@@ -664,11 +682,12 @@ public class ReportsQueries {
 
 
         try {
-            PreparedStatement s = con.prepareStatement("select city, country, postalCode" +
-                    "count(reserved.listid) as total from reserved join located join address where " +
-                    "reserved.listid = located.listid and located.addressid = address.addressid and" +
-                    "(reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false " +
-                    "group by city, country, postalCode");
+            String query = "select city, country, postalCode, count(reserved.listid) as total from " +
+                    "reserved join located using (listid) join address using (addressid) " +
+                    "where startDate <= ? and endDate >= ? and statusAvailable = false " +
+                    "group by city, country, postalCode";
+
+            PreparedStatement s = con.prepareStatement(query);
 
             s.setString(1, endDate);
             s.setString(2, startDate);
@@ -676,10 +695,10 @@ public class ReportsQueries {
 
             //print out all the listings
             int counter = 0;
-            String format = "%1$-8s| %2$-10s | %3$-10s | %4$-10s";
+            String format = "%1$-8s| %2$-10s | %3$-15s | %4$-10s";
             System.out.println(String.format(format, "City", "Country", "Postal Code", "Count"));
             String under = "_";
-            for (int i = 0; i < 30; i++) {
+            for (int i = 0; i < 50; i++) {
                 under += "_";
             }
             System.out.println(under);
@@ -716,10 +735,10 @@ public class ReportsQueries {
 
             //print out all the listings
             int counter = 0;
-            String format = "%1$-8s| %2$-10s";
+            String format = "%1$-15s| %2$-6s";
             System.out.println(String.format(format, "Country", "Count"));
             String under = "_";
-            for (int i = 0; i < 30; i++) {
+            for (int i = 0; i < 25; i++) {
                 under += "_";
             }
             System.out.println(under);
@@ -783,11 +802,7 @@ public class ReportsQueries {
             ResultSet rs = s.executeQuery();
 
             //print out all the listings
-            if (!rs.next()) {
-                System.out.println("No Entries.\n");
-                ReportsQueries.mainMenu(con, user);
-            }
-            String format = "%1$-8s| %2$-10s | %3$-10s | %4$-10s";
+            String format = "%1$-8s| %2$-10s | %3$-15s | %4$-10s";
             System.out.println(String.format(format, "Country", "City", "Postal Code", "Count"));
             String under = "_";
             for (int i = 0; i < 50; i++) {
@@ -836,10 +851,10 @@ public class ReportsQueries {
             s.setString(1, country);
             ResultSet rs = s.executeQuery();
 
-            String format = "%1$-8s| %2$-20s | %3$-20s | %4$-10s";
+            String format = "%1$-12s| %2$-10s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
             String under = "_";
-            for (int i = 0; i < 40; i++) {
+            for (int i = 0; i < 60; i++) {
                 under += "_";
             }
             System.out.println(under);
@@ -864,7 +879,7 @@ public class ReportsQueries {
     }
 
     public static void rankListingHostCountryCity() {
-        System.out.println("Country");
+        System.out.println("Country:");
         String country = scan.nextLine();
 
         System.out.println("City:");
@@ -886,7 +901,7 @@ public class ReportsQueries {
             ResultSet rs = s.executeQuery();
 
             int counter = 0;
-            String format = "%1$-8s| %2$-20s | %3$-20s | %4$-10s";
+            String format = "%1$-12s| %2$-10s | %3$-10s | %4$-10s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
             String under = "_";
             for (int i = 0; i < 60; i++) {
@@ -934,9 +949,8 @@ public class ReportsQueries {
     }
     public static int getTotalListingsCountry(String country) {
         try {
-            PreparedStatement s = con.prepareStatement("select * from listing join located join address" +
-                    "where listing.listID = located.listID and located.addressID = address.addressID and " +
-                    "address.country = ?");
+            PreparedStatement s = con.prepareStatement("select * from listing join located using (listid)" +
+                    " join address using (addressid) where country = ?");
             s.setString(1, country);
             ResultSet rs = s.executeQuery();
 
@@ -954,9 +968,8 @@ public class ReportsQueries {
     //helper for getting total listings in a city+country
     public static int getTotalListingsCountryCity(String country, String city) {
         try {
-            PreparedStatement s = con.prepareStatement("select * from listing join located join address" +
-                    "where listing.listID = located.listID and located.addressID = address.addressID and " +
-                    "address.country = ? and address.city = ?");
+            PreparedStatement s = con.prepareStatement("select * from listing join located using (listid)" +
+                    " join address using (addressid) where country = ? and city = ?");
             s.setString(1, country);
             s.setString(2, city);
             ResultSet rs = s.executeQuery();
@@ -976,29 +989,23 @@ public class ReportsQueries {
     // hosts with 10% or more of countries/cities total listings
     public static void plus10percentListingsCountry() {
 
-        System.out.println("Country");
+        System.out.println("Country:");
         String country = scan.nextLine();
         int totalListings = getTotalListingsCountry(country);
 
         int tenPercList = totalListings / 10;
 
         try {
-//            PreparedStatement s = con.prepareStatement("select listing.hostID, users.firstName, users.lastName, " +
-//                    "count(listing.listID) as total_list from Users join listing join located join address" +
-//                    "where listing.hostID = users.sin and listing.listID = located.listID and " +
-//                    "located.addressID = address.addressID and address.country = ?" +
-//                    "group by listing.hostID order by total_list DESC");
-            PreparedStatement s = con.prepareStatement("select owns.hostID, users.firstName, users.lastName, " +
-                    "count(listing.listID) as total_list from Users join owns join listing join located join address" +
-                    "where owns.listID = listing.listID and owns.hostID = users.sin and " +
-                    "listing.listID = located.listID and " +
-                    "located.addressID = address.addressID and address.country = ?" +
-                    "group by listing.hostID order by total_list DESC");
+            String query = "select hostID, firstName, lastName, count(listID) as total from owns join Listing" +
+                    " using (listid) join located using (listid) join address using (addressID) join " +
+                    "Users where users.sin = owns.hostid " +
+                    "and country = ? group by hostID order by total DESC";
+            PreparedStatement s = con.prepareStatement(query);
             s.setString(1, country);
             ResultSet rs = s.executeQuery();
 
             int counter = 0;
-            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            String format = "%1$-12s| %2$-15s | %3$-15s | %4$-15s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
             String under = "_";
             for (int i = 0; i < 60; i++) {
@@ -1006,10 +1013,10 @@ public class ReportsQueries {
             }
             System.out.println(under);
             while (rs.next()) {
-                int hostID = rs.getInt("listing.hostID");
-                String firstName = rs.getString("users.firstName");
-                String lastName = rs.getString("users.lastName");
-                int count = rs.getInt("total_list");
+                int hostID = rs.getInt("hostID");
+                String firstName = rs.getString("firstName");
+                String lastName = rs.getString("lastName");
+                int count = rs.getInt("total");
                 if (count >= tenPercList) {
                     counter++;
                     System.out.println(String.format(format, hostID + "", firstName, lastName, count + ""));
@@ -1028,30 +1035,24 @@ public class ReportsQueries {
     public static void plus10percentListingsCityCountry() {
         System.out.println("City:");
         String city = scan.nextLine();
-        System.out.println("Country");
+        System.out.println("Country:");
         String country = scan.nextLine();
         int totalListings = getTotalListingsCountryCity(country, city);
 
         int tenPercList = totalListings / 10;
 
         try {
-//            PreparedStatement s = con.prepareStatement("select listing.hostID, users.firstName, users.lastName, " +
-//                    "count(listing.listID) as total_list from Users join listing join located join address" +
-//                    "where listing.hostID = users.sin and listing.listID = located.listID and " +
-//                    "located.addressID = address.addressID and address.country = ? and address.city = ?" +
-//                    "group by listing.hostID order by total_list DESC");
-            PreparedStatement s = con.prepareStatement("select owns.hostID, users.firstName, users.lastName, " +
-                    "count(listing.listID) as total_list from Users join owns join listing join located join address" +
-                    "where owns.listID = listing.listID and owns.hostID = users.sin and " +
-                    "listing.listID = located.listID and " +
-                    "located.addressID = address.addressID and address.country = ? and address.city = ?" +
-                    "group by listing.hostID order by total_list DESC");
+            String query = "select hostID, firstName, lastName, count(listID) as total from owns join Listing" +
+                    " using (listid) join located using (listid) join address using (addressID) join " +
+                    "Users where users.sin = owns.hostid " +
+                    "and country = ? and city = ? group by hostID order by total DESC";
+            PreparedStatement s = con.prepareStatement(query);
             s.setString(1, country);
             s.setString(2, city);
             ResultSet rs = s.executeQuery();
 
             int counter = 0;
-            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            String format = "%1$-12s| %2$-15s | %3$-15s | %4$-15s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Count"));
             String under = "_";
             for (int i = 0; i < 60; i++) {
@@ -1059,10 +1060,10 @@ public class ReportsQueries {
             }
             System.out.println(under);
             while (rs.next()) {
-                int hostID = rs.getInt("listing.hostID");
-                String firstName = rs.getString("users.firstName");
-                String lastName = rs.getString("users.lastName");
-                int count = rs.getInt("total_list");
+                int hostID = rs.getInt("hostID");
+                String firstName = rs.getString("firstName");
+                String lastName = rs.getString("lastName");
+                int count = rs.getInt("total");
                 if (count >= tenPercList) {
                     counter++;
                     System.out.println(String.format(format, hostID + "", firstName, lastName, count + ""));
@@ -1073,6 +1074,7 @@ public class ReportsQueries {
             }
 
         } catch (Exception e) {
+            System.out.println(e);
             System.out.println("Unable to complete.");
         }
         ReportsQueries.mainMenu(con, user);
@@ -1088,15 +1090,20 @@ public class ReportsQueries {
         String endDate = scan.nextLine();
 
         try {
-            PreparedStatement s = con.prepareStatement("select reserved.renterID, users.firstName, users.lastName, " +
-                    "count(reservationID) as total_bookings from users join reserved where users.sin = reserved.renterID" +
-                    "and (reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false");
+//            PreparedStatement s = con.prepareStatement("select reserved.renterID, users.firstName, users.lastName, " +
+//                    "count(reservationID) as total_bookings from users join reserved where users.sin = reserved.renterID" +
+//                    "and (reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false");
+            String query = "select renterid, firstname, lastname, count(reservationid) as total from users join" +
+                    " reserved where sin = renterid and reserved.startDate <= ? and reserved.endDate >= ?" +
+                    " and statusAvailable = false group by renterid order by total DESC";
+//            System.out.println(query);
+            PreparedStatement s = con.prepareStatement(query);
             s.setString(1, endDate);
             s.setString(2, startDate);
             ResultSet rs = s.executeQuery();
 
             int counter = 0;
-            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            String format = "%1$-15s| %2$-15s | %3$-15s | %4$-10s";
             System.out.println(String.format(format, "Renter ID", "First Name", "Last Name", "Count"));
             String under = "_";
             for (int i = 0; i < 60; i++) {
@@ -1104,10 +1111,10 @@ public class ReportsQueries {
             }
             System.out.println(under);
             while (rs.next()) {
-                int renterID = rs.getInt("reserved.renterID");
-                String firstName = rs.getString("users.firstName");
-                String lastName = rs.getString("users.lastName");
-                int count = rs.getInt("total_bookings");
+                int renterID = rs.getInt("renterID");
+                String firstName = rs.getString("firstName");
+                String lastName = rs.getString("lastName");
+                int count = rs.getInt("total");
                 System.out.println(String.format(format, renterID + "", firstName, lastName, count + ""));
                 counter++;
             }
@@ -1139,12 +1146,13 @@ public class ReportsQueries {
         String country = scan.nextLine();
 
         try {
-            PreparedStatement s = con.prepareStatement("select reserved.renterID, users.firstName, users.lastName, " +
-                    "count(reservationID) as total_bookings from users join reserved join located join address " +
-                    "where users.sin = reserved.renterID and reserved.listID = located.listID and " +
-                    "address.addressID = located.addressID" +
-                    "and (reserved.startDate <= ? and reserved.endDate >= ?) and statusAvailable = false " +
-                    "and address.city = ? and address.country = ?");
+            String query = "select renterid, firstname, lastname, count(reservationid) as total from users join" +
+                    " reserved join listing using (listid) join located using (listid) join " +
+                    "address using (addressid) where sin = renterid and reserved.startDate <= ? and " +
+                    "reserved.endDate >= ? and statusAvailable = false and city = ? and country = ? " +
+                    "group by renterid order by total DESC";
+//            System.out.println(query);
+            PreparedStatement s = con.prepareStatement(query);
             s.setString(1, "2022-08-08");
             s.setString(2, "2021-08-08");
             s.setString(3, city);
@@ -1152,7 +1160,7 @@ public class ReportsQueries {
             ResultSet rs = s.executeQuery();
 
 
-            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            String format = "%1$-15s| %2$-15s | %3$-15s | %4$-10s";
             System.out.println(String.format(format, "Renter ID", "First Name", "Last Name", "Count"));
             String under = "_";
             for (int i = 0; i < 60; i++) {
@@ -1161,10 +1169,10 @@ public class ReportsQueries {
             System.out.println(under);
             int counter = 0;
             while (rs.next()) {
-                int renterID = rs.getInt("reserved.renterID");
-                String firstName = rs.getString("users.firstName");
-                String lastName = rs.getString("users.lastName");
-                int count = rs.getInt("total_bookings");
+                int renterID = rs.getInt("renterID");
+                String firstName = rs.getString("firstName");
+                String lastName = rs.getString("lastName");
+                int count = rs.getInt("total");
                 if (count >= 2) {
                     System.out.println(String.format(format, renterID + "", firstName, lastName, count + ""));
                     counter++;
@@ -1185,18 +1193,19 @@ public class ReportsQueries {
 
     public static void rankHostCancel() {
         try {
-            PreparedStatement s = con.prepareStatement("select reserved.hostID, users.firstName, users.lastName," +
-                    "count(reservationID) as total from reserved join users where " +
-                    "statusAvailable = true and users.sin = reserved.hostID and startDate >= 2021-08-01" +
-                    "group by reserved.hostID order by total DESC");
+            String query = "select hostid, firstname, lastname, count(reservationid) as total from reserved join users " +
+                    "where users.sin = reserved.renterid and statusAvailable = true and hostCancelled = true " +
+                    "and users.sin = reserved.hostID and startDate >= '2021-08-01' "+
+                    "group by reserved.hostID order by total DESC";
+            PreparedStatement s = con.prepareStatement(query);
             ResultSet rs = s.executeQuery();
 
 
             int counter = 0;
-            String format = "%1$-8s| %2$-8s | %3$-10s | %4$-10s";
+            String format = "%1$-15s| %2$-15s | %3$-15s | %4$-125s";
             System.out.println(String.format(format, "Host ID", "First Name", "Last Name", "Total Cancellations"));
             String under = "_";
-            for (int i = 0; i < 60; i++) {
+            for (int i = 0; i < 80; i++) {
                 under += "_";
             }
             System.out.println(under);
@@ -1225,10 +1234,11 @@ public class ReportsQueries {
 
     public static void rankRenterCancel() {
         try {
-            PreparedStatement s = con.prepareStatement("select reserved.renterID, users.firstName, users.lastName," +
-                    "count(reservationID) as total from reserved join users where " +
-                    "statusAvailable = true and users.sin = reserved.renterID and startDate >= 2021-08-01" +
-                    "group by reserved.renterID order by total DESC");
+            String query = "select renterid, firstname, lastname, count(reservationid) as total from reserved join users " +
+                    "where users.sin = reserved.renterid and statusAvailable = true and hostCancelled = false " +
+                    "and users.sin = reserved.hostID and startDate >= '2021-08-01' "+
+                    "group by reserved.renterid order by total DESC";
+            PreparedStatement s = con.prepareStatement(query);
             ResultSet rs = s.executeQuery();
 
 
