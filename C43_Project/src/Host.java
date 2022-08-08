@@ -438,7 +438,7 @@ public class Host {
             String query = "SET SQL_SAFE_UPDATES = 0";
             PreparedStatement query1 = con.prepareStatement(query);
             query1.executeUpdate();
-            query = "UPDATE Listing SET price = ? WHERE listID = ? and listID NOT IN (SELECT listID FROM Reserved WHERE listID = ? AND CURDATE() > endDate)";
+            query = "UPDATE Listing SET price = ? WHERE listID = ?";
             PreparedStatement q = con.prepareStatement(query);
             q.setDouble(1, price);
             q.setInt(2, listID);

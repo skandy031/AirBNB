@@ -4,13 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="14e37f36-14e9-41b8-ab88-41681dd4cecb" name="Changes" comment="Working write review">
+    <list default="true" id="14e37f36-14e9-41b8-ab88-41681dd4cecb" name="Changes" comment="Fixed some bugs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AirBNB_BulkInfo" beforeDir="false" afterPath="$PROJECT_DIR$/AirBNB_BulkInfo" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Driver.java" beforeDir="false" afterPath="$PROJECT_DIR$/Driver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Host.java" beforeDir="false" afterPath="$PROJECT_DIR$/Host.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Renter.java" beforeDir="false" afterPath="$PROJECT_DIR$/Renter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ReportsQueries.java" beforeDir="false" afterPath="$PROJECT_DIR$/ReportsQueries.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/User.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../c43project.ddl" beforeDir="false" afterPath="$PROJECT_DIR$/../../c43project.ddl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -107,7 +106,14 @@
       <option name="project" value="LOCAL" />
       <updated>1659923169629</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Fixed some bugs">
+      <created>1659933797501</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1659933797501</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -129,6 +135,7 @@
     <MESSAGE value="updated ddl for reserved with hostCancelled" />
     <MESSAGE value="Have a working version of nounPhrases" />
     <MESSAGE value="Working write review" />
-    <option name="LAST_COMMIT_MESSAGE" value="Working write review" />
+    <MESSAGE value="Fixed some bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed some bugs" />
   </component>
 </project>

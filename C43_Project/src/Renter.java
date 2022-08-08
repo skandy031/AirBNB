@@ -1,4 +1,3 @@
-
     import java.util.ArrayList;
     import java.util.HashSet;
     import java.util.List;
@@ -446,7 +445,6 @@ public class Renter {
                     "(0) Exit to Menu \n" +
                     "(1) View Amenity List for Listing\n" +
                     "(2) Book Listing");
-
                 try {
                     option = scan.nextInt();
                     scan = new Scanner(System.in);
@@ -468,11 +466,6 @@ public class Renter {
                     System.out.println("Invalid type. Must be an integer.");
                 }
             }
-
-
-
-
-
         } catch (Exception e){
             System.out.println(e);
         }
@@ -510,7 +503,6 @@ public class Renter {
                 under += "_";
             }
             System.out.println(under);
-
             while (rs.next()) {
                 int reservationID = rs.getInt("reservationID");
                 resSet.add(reservationID);

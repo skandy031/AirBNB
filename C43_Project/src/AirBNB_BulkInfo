@@ -26,20 +26,27 @@ insert into Users values (7, "pass", "Software Engineer", "Mac", "Jones", "1980-
 insert into Hosts values (7);
 insert into Renter values (7, "1212343456567878", 6, 2025, 123);
 
-insert into Listing values (1, "House", 15.0, -25.0, 199.00);
+insert into Listing values (1, "Full House", 15.0, -25.0, 199.00);
 insert into Address values (1, 123, "Main St", "Toronto", "Ontario", "Canada", "12345", null);
 insert into Located values (1, 1);
 insert into Owns values (1, 1);
 insert into Amenities values (1, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true);
 insert into Provides values (1, 1);
 
-insert into Listing values (2, "Condo", 15.0, -25.0, 100.00);
+insert into Listing values (2, "Apartment", 15.0, -25.0, 100.00);
 insert into Address values (2, 1, "Yonge St", "Orlando", "Florida", "USA", "12345", null);
 insert into Located values (2, 2);
 insert into Owns values (2, 2);
 insert into Amenities values (2, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true);
 insert into Provides values (2, 2);
 
+insert into Listing values (3, "Room", 15.0, -25.0, 100.00);
+insert into Address values (2, 1, "Yonge St", "Orlando", "Florida", "USA", "12345", null);
+insert into Located values (2, 2);
+insert into Owns values (2, 2);
+insert into Amenities values (2, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true);
+insert into Provides values (2, 2);
+
+
 insert into Reserved values (1, 1, 3, 1, "2022-07-05", "2022-07-20", false, false, 199, null, null, null, null);
 insert into Reserved values (2, 2, 4, 2, "2022-07-05", "2022-07-20", false, false, 199, null, null, null, null);
-
