@@ -88,11 +88,11 @@ public class User {
             System.out.println("Password:");
             password = scan.next();
             System.out.println("First name:");
-            firstname = scan.next();
+            firstname = scan.nextLine();
             System.out.println("Last name:");
-            lastname = scan.next();
+            lastname = scan.nextLine();
             System.out.println("Occupation:");
-            occupation = scan.next();
+            occupation = scan.nextLine();
             System.out.println("Date of birth (YYYY-MM-DD):");
             dob = scan.next();
             System.out.println("Credit Card Number:");

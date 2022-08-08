@@ -378,7 +378,7 @@ public class Host {
     public static void viewBookings() {
         Integer listID = validListingID();
         if (listID == 0) return;
-        String query = "Select * FROM Reserved WHERE hostID = ? and listID = ? and hostID != renterID";
+        String query = "Select * FROM Reserved join Located using(listID) join Address using(addressID) WHERE hostID = ? and listID = ? and hostID != renterID";
         try {
             PreparedStatement query1 = con.prepareStatement(query);
             query1.setInt(1, user);
@@ -395,14 +395,14 @@ public class Host {
                     int reservationID = rs.getInt("reservationID");
                     int hostID = rs.getInt("hostID");
                     int price = rs.getInt("price");
-                    String startDate = rs.getString("startdate");
-                    String endDate = rs.getString("enddate");
-                    int streetNo = rs.getInt("streetno");
-                    String streetName = rs.getString("streetname");
+                    String startDate = rs.getString("startDate");
+                    String endDate = rs.getString("endDate");
+                    int streetNo = rs.getInt("streetNo");
+                    String streetName = rs.getString("streetName");
                     String city = rs.getString("city");
                     String province = rs.getString("province");
-                    String postalCode = rs.getString("postalcode");
-                    int unitNo = rs.getInt("unitno");
+                    String postalCode = rs.getString("postalCode");
+                    int unitNo = rs.getInt("unitNo");
                     System.out.println(String.format(format, reservationID + "", listID + "", hostID + "", price + "", startDate, endDate,
                         streetNo + "", streetName, city, province, postalCode, unitNo + ""));
                 }
@@ -429,7 +429,10 @@ public class Host {
                 }
                 break;
             }
-            String query = "UPDATE Listings SET price = ? WHERE listID = ?";
+            String query = "SET SQL_SAFE_UPDATES = 0";
+            PreparedStatement query1 = con.prepareStatement(query);
+            query1.executeUpdate();
+            query = "UPDATE Listings SET price = ? WHERE listID = ?";
             PreparedStatement q = con.prepareStatement(query);
             q.setDouble(1, price);
             q.setInt(2, listID);
@@ -479,6 +482,9 @@ public class Host {
         Integer resID = validResID();
         try {
             String query;
+            query = "SET SQL_SAFE_UPDATES = 0";
+            PreparedStatement query1 = con.prepareStatement(query);
+            query1.executeUpdate();
             query = "UPDATE reserved SET statusAvailable = true, hostCancelled = true WHERE reservationID = ?";
             PreparedStatement q = con.prepareStatement(query);
             q.setDouble(1, resID);
@@ -515,6 +521,7 @@ public class Host {
             String review;
             while (true) {
                 System.out.println("Leave a review:");
+                scan = new Scanner(System.in);
                 review = scan.nextLine();
                 if (review.length() > 199) {
                     System.out.println("Review too long. Keep it under 200 characters. Try again");
@@ -524,10 +531,14 @@ public class Host {
             }
             try {
                 //change status on reservation
+                String query = "SET SQL_SAFE_UPDATES = 0";
+                PreparedStatement query1 = con.prepareStatement(query);
+                query1.executeUpdate();
                 PreparedStatement s = con.prepareStatement("update reserved set " +
-                    "hostReview = ? where hostScore = ? and endDate < CURDATE()");
+                    "hostReview = ?, hostScore = ? WHERE endDate < CURDATE() and reservationID = ?");
                 s.setInt(2, score);
                 s.setString(1, review);
+                s.setInt(3,resID);
                 if (s.executeUpdate() != 1) {
                     System.out.println("The booking date has yet to be passed");
                     return;
@@ -537,7 +548,7 @@ public class Host {
                 System.out.println(e);
             }
         } catch (Exception E) {
-            System.out.println("The booking date has yet to be passed");
+            System.out.println("The booking date has yet to be passed" + E);
         }
     }
 
